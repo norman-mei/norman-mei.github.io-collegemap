@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Our College Map</title>
+    <style>
+        /* Basic styling */
+        html, body {
+            height: 100%;
+            margin: 0;
+            padding: 0;
+            font-family: sans-serif;
+        }
+        /* The map container must have a defined height */
+        #map {
+            height: 100%;
+            width: 100%;
+            background-color: grey; /* Placeholder color */
+        }
+        /* Styling for the InfoWindow content */
+        .info-window-content {
+            line-height: 1.4;
+        }
+        .info-window-content b {
+            font-size: 1.1em;
+            display: block;
+            margin-bottom: 4px;
+        }
+    </style>
+</head>
+<body>
+    <!-- The div where the map will be displayed -->
+    <div id="map"></div>
+
+    <!-- === JAVASCRIPT LOGIC === -->
+    <script>
+        // --- 1. DEFINE YOUR COLLEGE DATA ---
+        // IMPORTANT: Replace this with YOUR actual data!
+        // Find Latitude/Longitude using Google Maps (right-click -> "What's here?")
+        const collegeData = [
+            {
+                lat: 42.0894,
+                lng: -75.9695,
+                name: "SUNY Binghamton University",
+                person: "Norman"
+            },
+             {
+                lat: 40.7404,
+                lng: -73.9832,
+                name: "CUNY Baruch College",
+                person: "Norman"
+            }
+            // Add more colleges here...
+            // { lat: ..., lng: ..., name: "Another University", person: "Eve" },
+        ];
+
+        // --- 2. Initialize the Map ---
+        // This function will be called by the Google Maps API script once it loads
+        function initMap() {
+            console.log("Google Maps API loaded. Initializing map...");
+
+            // Define map options
+            const mapOptions = {
+                // Center the map initially (e.g., somewhere between US/Europe or on the first college)
+                center: { lat: 39.8283, lng: -98.5795 }, // Center of the US (adjust as needed)
+                zoom: 4, // Initial zoom level (adjust to show relevant area)
+
+                // --- Crucial: Disable Zooming ---
+                zoomControl: true,          // Hide the +/- zoom buttons
+                scrollwheel: true,          // Disable zoom via mouse scroll wheel
+                disableDoubleClickZoom: true, // Disable zoom on double-click
+
+                // --- Enable Panning ---
+                draggable: true,             // Allow map dragging (this is true by default)
+
+                // Other useful options
+                streetViewControl: true,    // Hide Street View Pegman
+                fullscreenControl: true,    // Hide fullscreen button
+                mapTypeControl: true,       // Hide Map/Satellite toggle
+                mapTypeId: 'roadmap'         // Use the standard road map style
+            };
+
+            // Create the map instance
+            const map = new google.maps.Map(document.getElementById("map"), mapOptions);
+
+            // --- 3. Add Markers and InfoWindows ---
+            const infowindow = new google.maps.InfoWindow(); // Create one InfoWindow instance
+
+            collegeData.forEach(college => {
+                const marker = new google.maps.Marker({
+                    position: { lat: college.lat, lng: college.lng },
+                    map: map, // Add the marker to the map created above
+                    title: `${college.name} (Attended by ${college.person})` // Basic hover text
+                    // animation: google.maps.Animation.DROP, // Optional: nice visual effect
+                });
+
+                // Add click listener to each marker
+                marker.addListener("click", () => {
+                    const contentString = `
+                        <div class="info-window-content">
+                            <b>${college.name}</b>
+                            Attended by: ${college.person}
+                        </div>`;
+                    infowindow.setContent(contentString);
+                    infowindow.open(map, marker); // Open the single InfoWindow at the clicked marker
+                });
+            });
+
+             console.log("Map initialized and markers added.");
+
+        } // End of initMap function
+
+        // Error handling if Google Maps script fails to load
+        function gmLoadError() {
+            console.error("Google Maps script failed to load. Check API key and network connection.");
+            document.getElementById("map").innerHTML = "Error loading Google Maps. Please check your API key and network connection.";
+        }
+
+    </script>
+
+    <!-- === Load Google Maps API === -->
+    <!--
+        IMPORTANT: Replace YOUR_API_KEY with your actual Google Maps API key.
+        The 'callback=initMap' tells the API to run our initMap function once loaded.
+        'onerror=gmLoadError' provides basic error handling.
+        'defer' makes the browser wait until HTML parsing is complete before executing the script.
+    -->
+    <script
+        src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCVEZB2WjUpEhqnqGjY_zMCQSKUHTdjAWc&callback=initMap&onerror=gmLoadError&v=weekly"
+        defer
+    ></script>
+
+</body>
+</html>
