@@ -21,11 +21,20 @@
         /* Styling for the InfoWindow content */
         .info-window-content {
             line-height: 1.4;
+            max-width: 250px; /* Prevent InfoWindow from becoming too wide */
         }
         .info-window-content b {
             font-size: 1.1em;
             display: block;
             margin-bottom: 4px;
+        }
+        /* Style for the image inside the InfoWindow */
+        .info-window-content img {
+            max-width: 100%;      /* Make image responsive within the InfoWindow */
+            height: auto;         /* Maintain aspect ratio */
+            display: block;       /* Ensure it takes its own line */
+            margin-top: 8px;      /* Add some space above the image */
+            border-radius: 4px;   /* Optional: slightly rounded corners */
         }
     </style>
 </head>
@@ -35,50 +44,45 @@
 
     <!-- === JAVASCRIPT LOGIC === -->
     <script>
-        // --- 1. DEFINE YOUR COLLEGE DATA ---
-        // IMPORTANT: Replace this with YOUR actual data!
-        // Find Latitude/Longitude using Google Maps (right-click -> "What's here?")
+        // --- 1. DEFINE YOUR COLLEGE DATA (NOW INCLUDES imageUrl) ---
+        // IMPORTANT: Replace placeholder image URLs with YOUR actual, direct image URLs!
         const collegeData = [
             {
                 lat: 42.0894,
                 lng: -75.9695,
                 name: "SUNY Binghamton University",
-                person: "Norman"
+                person: "Norman",
+                // Example image URL - REPLACE THIS
+                imageUrl: "https://upload.wikimedia.org/wikipedia/commons/thumb/4/4c/Binghamton_University_Clock_Tower.JPG/1024px-Binghamton_University_Clock_Tower.JPG"
             },
              {
                 lat: 40.7404,
                 lng: -73.9832,
                 name: "CUNY Baruch College",
-                person: "Norman"
+                person: "Norman",
+                 // Example image URL - REPLACE THIS
+                imageUrl: "https://upload.wikimedia.org/wikipedia/commons/thumb/d/d8/Baruch_College_Newman_Vertical_Campus_jeh.jpg/1024px-Baruch_College_Newman_Vertical_Campus_jeh.jpg"
             }
             // Add more colleges here...
-            // { lat: ..., lng: ..., name: "Another University", person: "Eve" },
+            // { lat: ..., lng: ..., name: "Another University", person: "Eve", imageUrl: "URL_TO_IMAGE.jpg" },
         ];
 
         // --- 2. Initialize the Map ---
-        // This function will be called by the Google Maps API script once it loads
         function initMap() {
             console.log("Google Maps API loaded. Initializing map...");
 
-            // Define map options
+            // Define map options (Adjust center/zoom as needed)
             const mapOptions = {
-                // Center the map initially (e.g., somewhere between US/Europe or on the first college)
-                center: { lat: 39.8283, lng: -98.5795 }, // Center of the US (adjust as needed)
-                zoom: 4, // Initial zoom level (adjust to show relevant area)
-
-                // --- Crucial: Disable Zooming ---
-                zoomControl: true,          // Hide the +/- zoom buttons
-                scrollwheel: true,          // Disable zoom via mouse scroll wheel
-                disableDoubleClickZoom: true, // Disable zoom on double-click
-
-                // --- Enable Panning ---
-                draggable: true,             // Allow map dragging (this is true by default)
-
-                // Other useful options
-                streetViewControl: true,    // Hide Street View Pegman
-                fullscreenControl: true,    // Hide fullscreen button
-                mapTypeControl: true,       // Hide Map/Satellite toggle
-                mapTypeId: 'roadmap'         // Use the standard road map style
+                center: { lat: 41.4, lng: -74.9 }, // Centered roughly between the two example points
+                zoom: 8, // Zoomed in a bit more for these two points
+                zoomControl: true,
+                scrollwheel: true, // You had this true, keeping it - set to false to disable scroll zoom
+                disableDoubleClickZoom: true,
+                draggable: true,
+                streetViewControl: true,
+                fullscreenControl: true,
+                mapTypeControl: true,
+                mapTypeId: 'roadmap'
             };
 
             // Create the map instance
@@ -88,20 +92,35 @@
             const infowindow = new google.maps.InfoWindow(); // Create one InfoWindow instance
 
             collegeData.forEach(college => {
+                // Check if imageUrl exists before creating the marker content with an image
+                if (!college.imageUrl) {
+                    console.warn(`Missing imageUrl for ${college.name}`);
+                }
+
                 const marker = new google.maps.Marker({
                     position: { lat: college.lat, lng: college.lng },
-                    map: map, // Add the marker to the map created above
-                    title: `${college.name} (Attended by ${college.person})` // Basic hover text
-                    // animation: google.maps.Animation.DROP, // Optional: nice visual effect
+                    map: map,
+                    title: `${college.name} (Attended by ${college.person})`
+                    // animation: google.maps.Animation.DROP,
                 });
 
                 // Add click listener to each marker
                 marker.addListener("click", () => {
+                    // --- MODIFIED CONTENT STRING ---
+                    // Include the <img> tag, using the college.imageUrl
+                    // Added a check: only add the img tag if imageUrl is present
+                    const imageHtml = college.imageUrl
+                        ? `<img src="${college.imageUrl}" alt="${college.name} photo">`
+                        : '<p><small>No image available</small></p>'; // Placeholder if no image URL
+
                     const contentString = `
                         <div class="info-window-content">
                             <b>${college.name}</b>
                             Attended by: ${college.person}
+                            ${imageHtml} 
                         </div>`;
+                    // --- END OF MODIFICATION ---
+
                     infowindow.setContent(contentString);
                     infowindow.open(map, marker); // Open the single InfoWindow at the clicked marker
                 });
@@ -111,7 +130,7 @@
 
         } // End of initMap function
 
-        // Error handling if Google Maps script fails to load
+        // Error handling
         function gmLoadError() {
             console.error("Google Maps script failed to load. Check API key and network connection.");
             document.getElementById("map").innerHTML = "Error loading Google Maps. Please check your API key and network connection.";
@@ -120,14 +139,9 @@
     </script>
 
     <!-- === Load Google Maps API === -->
-    <!--
-        IMPORTANT: Replace YOUR_API_KEY with your actual Google Maps API key.
-        The 'callback=initMap' tells the API to run our initMap function once loaded.
-        'onerror=gmLoadError' provides basic error handling.
-        'defer' makes the browser wait until HTML parsing is complete before executing the script.
-    -->
+    <!-- Remember to use your actual API key and secure it with restrictions -->
     <script
-        src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCVEZB2WjUpEhqnqGjY_zMCQSKUHTdjAWc&callback=initMap&onerror=gmLoadError&v=weekly"
+        src="https://maps.googleapis.com/maps/api/js?key=YOUR_API_KEY&callback=initMap&onerror=gmLoadError&v=weekly"
         defer
     ></script>
 
