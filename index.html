@@ -36,6 +36,21 @@
             margin-top: 8px;      /* Add some space above the image */
             border-radius: 4px;   /* Optional: slightly rounded corners */
         }
+
+        /* --- NEW CSS for the description control --- */
+        .map-description-control {
+            background-color: rgba(255, 255, 255, 0.9); /* Slightly less transparent */
+            padding: 12px 18px; /* Increased padding for a bigger box */
+            margin: 10px; /* Keeps standard spacing */
+            border: 1px solid #bbb; /* Slightly softer border */
+            border-radius: 4px;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+            font-size: 1.15em; /* Increased font size */
+            color: #222; /* Slightly darker text */
+            cursor: default;
+            max-width: 250px;
+        /* --- End of NEW CSS --- */
+
     </style>
 </head>
 <body>
@@ -44,44 +59,40 @@
 
     <!-- === JAVASCRIPT LOGIC === -->
     <script>
-        // --- 1. DEFINE YOUR COLLEGE DATA (NOW INCLUDES imageUrl) ---
-        // IMPORTANT: Replace placeholder image URLs with YOUR actual, direct image URLs!
+        // --- 1. DEFINE YOUR COLLEGE DATA ---
         const collegeData = [
             {
                 lat: 42.0894,
                 lng: -75.9695,
                 name: "SUNY Binghamton University",
                 person: "Norman",
-                // Example image URL - REPLACE THIS
-                imageUrl: "https://upload.wikimedia.org/wikipedia/commons/thumb/4/4c/Binghamton_University_Clock_Tower.JPG/1024px-Binghamton_University_Clock_Tower.JPG"
+                imageUrl: "https://pbs.twimg.com/profile_images/601475591918002177/qeftl81n_400x400.png"
             },
              {
                 lat: 40.7404,
                 lng: -73.9832,
                 name: "CUNY Baruch College",
                 person: "Norman",
-                 // Example image URL - REPLACE THIS
-                imageUrl: "https://upload.wikimedia.org/wikipedia/commons/thumb/d/d8/Baruch_College_Newman_Vertical_Campus_jeh.jpg/1024px-Baruch_College_Newman_Vertical_Campus_jeh.jpg"
+                imageUrl: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRjeFAV6ipn_I_ijO_HY8NtztoDY3XTt4oRPA&s"
             }
             // Add more colleges here...
-            // { lat: ..., lng: ..., name: "Another University", person: "Eve", imageUrl: "URL_TO_IMAGE.jpg" },
         ];
 
         // --- 2. Initialize the Map ---
         function initMap() {
             console.log("Google Maps API loaded. Initializing map...");
 
-            // Define map options (Adjust center/zoom as needed)
+            // Define map options
             const mapOptions = {
-                center: { lat: 41.4, lng: -74.9 }, // Centered roughly between the two example points
-                zoom: 8, // Zoomed in a bit more for these two points
+                center: { lat: 41.4, lng: -74.9 },
+                zoom: 8,
                 zoomControl: true,
-                scrollwheel: true, // You had this true, keeping it - set to false to disable scroll zoom
+                scrollwheel: true,
                 disableDoubleClickZoom: true,
                 draggable: true,
                 streetViewControl: true,
                 fullscreenControl: true,
-                mapTypeControl: true,
+                mapTypeControl: true, // Keep this true to show Map/Satellite
                 mapTypeId: 'roadmap'
             };
 
@@ -89,44 +100,48 @@
             const map = new google.maps.Map(document.getElementById("map"), mapOptions);
 
             // --- 3. Add Markers and InfoWindows ---
-            const infowindow = new google.maps.InfoWindow(); // Create one InfoWindow instance
+            const infowindow = new google.maps.InfoWindow();
 
             collegeData.forEach(college => {
-                // Check if imageUrl exists before creating the marker content with an image
                 if (!college.imageUrl) {
                     console.warn(`Missing imageUrl for ${college.name}`);
                 }
-
                 const marker = new google.maps.Marker({
                     position: { lat: college.lat, lng: college.lng },
                     map: map,
                     title: `${college.name} (Attended by ${college.person})`
-                    // animation: google.maps.Animation.DROP,
                 });
 
-                // Add click listener to each marker
                 marker.addListener("click", () => {
-                    // --- MODIFIED CONTENT STRING ---
-                    // Include the <img> tag, using the college.imageUrl
-                    // Added a check: only add the img tag if imageUrl is present
                     const imageHtml = college.imageUrl
                         ? `<img src="${college.imageUrl}" alt="${college.name} photo">`
-                        : '<p><small>No image available</small></p>'; // Placeholder if no image URL
-
+                        : '<p><small>No image available</small></p>';
                     const contentString = `
                         <div class="info-window-content">
                             <b>${college.name}</b>
                             Attended by: ${college.person}
-                            ${imageHtml} 
+                            ${imageHtml}
                         </div>`;
-                    // --- END OF MODIFICATION ---
-
                     infowindow.setContent(contentString);
-                    infowindow.open(map, marker); // Open the single InfoWindow at the clicked marker
+                    infowindow.open(map, marker);
                 });
             });
 
-             console.log("Map initialized and markers added.");
+            // --- 4. Add Custom Description Control ---
+            // Create the div element for the control
+            const descriptionControlDiv = document.createElement('div');
+            // Assign the CSS class for styling
+            descriptionControlDiv.classList.add('map-description-control');
+            // Set the text content
+            descriptionControlDiv.innerHTML = 'This is my college map of people I know.';
+
+            // Add the control to the map.
+            // map.controls is an array of controls for each position.
+            // We push our div onto the array for the TOP_LEFT position.
+            map.controls[google.maps.ControlPosition.TOP_LEFT].push(descriptionControlDiv);
+            // --- End of Custom Control Code ---
+
+             console.log("Map initialized and markers added. Custom control added.");
 
         } // End of initMap function
 
@@ -140,9 +155,10 @@
 
     <!-- === Load Google Maps API === -->
     <!-- Remember to use your actual API key and secure it with restrictions -->
+    <!-- Added async based on previous console warning -->
     <script
         src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCVEZB2WjUpEhqnqGjY_zMCQSKUHTdjAWc&callback=initMap&onerror=gmLoadError&v=weekly"
-        defer
+        async defer
     ></script>
 
 </body>
