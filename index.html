@@ -3,163 +3,365 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Our College Map</title>
+    <title>Northeast Schools Map</title>
     <style>
-        /* Basic styling */
         html, body {
             height: 100%;
             margin: 0;
             padding: 0;
             font-family: sans-serif;
         }
-        /* The map container must have a defined height */
         #map {
             height: 100%;
             width: 100%;
-            background-color: grey; /* Placeholder color */
+            background-color: grey;
         }
-        /* Styling for the InfoWindow content */
-        .info-window-content {
-            line-height: 1.4;
-            max-width: 250px; /* Prevent InfoWindow from becoming too wide */
-        }
-        .info-window-content b {
-            font-size: 1.1em;
-            display: block;
-            margin-bottom: 4px;
-        }
-        /* Style for the image inside the InfoWindow */
-        .info-window-content img {
-            max-width: 100%;      /* Make image responsive within the InfoWindow */
-            height: auto;         /* Maintain aspect ratio */
-            display: block;       /* Ensure it takes its own line */
-            margin-top: 8px;      /* Add some space above the image */
-            border-radius: 4px;   /* Optional: slightly rounded corners */
-        }
-
-        /* --- NEW CSS for the description control --- */
+        .info-window-content { line-height: 1.4; max-width: 250px; }
+        .info-window-content b { font-size: 1.1em; display: block; margin-bottom: 4px; }
+        .info-window-content img { max-width: 100%; height: auto; display: block; margin-bottom: 8px; border-radius: 4px; border: none; }
+        .info-window-content a { color: inherit; text-decoration: none; }
+        .info-window-content a:hover { text-decoration: underline; cursor: pointer; }
+        .info-window-type { color: #555; font-style: italic; }
         .map-description-control {
-            background-color: rgba(255, 255, 255, 0.9); /* Slightly less transparent */
-            padding: 12px 18px; /* Increased padding for a bigger box */
-            margin: 10px; /* Keeps standard spacing */
-            border: 1px solid #bbb; /* Slightly softer border */
+            background-color: rgba(255, 255, 255, 0.9);
+            padding: 10px 15px;
+            margin: 5px 10px 10px 10px;
+            border: 1px solid #bbb;
             border-radius: 4px;
-            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
-            font-size: 1.15em; /* Increased font size */
-            color: #222; /* Slightly darker text */
+            box-shadow: 0 1px 4px rgba(0, 0, 0, 0.2);
+            font-size: 1.0em;
+            color: #222;
             cursor: default;
-            max-width: 250px;
-        /* --- End of NEW CSS --- */
+            box-sizing: border-box;
+            text-align: center;
+
+            order: 1;
+        }
+        .map-legend-control {
+            background-color: rgba(255, 255, 255, 0.9);
+            padding: 10px;
+
+            margin: 0px 10px 10px 10px;
+            border: 1px solid #bbb;
+            border-radius: 4px;
+            box-shadow: 0 1px 4px rgba(0, 0, 0, 0.2);
+            font-size: 0.9em;
+            color: #333;
+            cursor: default;
+            max-width: 150px;
+            order: 2;
+        }
+        .map-legend-control h4 {
+            margin-top: 0;
+            margin-bottom: 8px;
+            padding-bottom: 4px;
+            border-bottom: 1px solid #eee;
+            font-size: 1.1em;
+            font-weight: bold;
+        }
+        .legend-item { display: flex; align-items: center; margin-bottom: 4px; }
+        .legend-color-box { width: 16px; height: 16px; border: 1px solid #ccc; margin-right: 8px; flex-shrink: 0; display: inline-block; }
 
     </style>
 </head>
 <body>
-    <!-- The div where the map will be displayed -->
     <div id="map"></div>
-
-    <!-- === JAVASCRIPT LOGIC === -->
     <script>
-        // --- 1. DEFINE YOUR COLLEGE DATA ---
+
         const collegeData = [
-            {
-                lat: 42.0894,
-                lng: -75.9695,
-                name: "SUNY Binghamton University",
-                person: "Norman",
-                imageUrl: "https://pbs.twimg.com/profile_images/601475591918002177/qeftl81n_400x400.png"
-            },
-             {
-                lat: 40.7404,
-                lng: -73.9832,
-                name: "CUNY Baruch College",
-                person: "Norman",
-                imageUrl: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRjeFAV6ipn_I_ijO_HY8NtztoDY3XTt4oRPA&s"
-            }
-            // Add more colleges here...
+            { lat: 42.0894, lng: -75.9695, name: "SUNY Binghamton University", person: "Norman", imageUrl: "https://pbs.twimg.com/profile_images/601475591918002177/qeftl81n_400x400.png", homepageUrl: "https://www.binghamton.edu/" },
+            { lat: 40.7404, lng: -73.9832, name: "CUNY Baruch College", person: "Norman", imageUrl: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRjeFAV6ipn_I_ijO_HY8NtztoDY3XTt4oRPA&s", homepageUrl: "https://www.baruch.cuny.edu/" },
         ];
 
-        // --- 2. Initialize the Map ---
+        const sunyCampuses = [
+            { lat: 43.3531, lng: -73.6541, name: "SUNY Adirondack CC ", type: "SUNY", homepageUrl: "https://www.sunyacc.edu/", imageUrl: "https://getlogovector.com/wp-content/uploads/2020/01/suny-adirondack-logo-vector.png" },
+            { lat: 42.6842, lng: -73.8261, name: "SUNY Albany", type: "SUNY", homepageUrl: "https://www.albany.edu/", imageUrl: "https://www.albany.edu/sites/default/files/UAlbanyMark_F_S01A_HEX_Gold_Black_300ppi_.jpg" },
+            { lat: 42.2552, lng: -77.7947, name: "SUNY Alfred State College", type: "SUNY", homepageUrl: "https://www.alfredstate.edu/", imageUrl: "https://upload.wikimedia.org/wikipedia/commons/e/e6/Alfred_State_Primary_Logo.png" },
+            { lat: 42.1348, lng: -75.9086, name: "SUNY Broome CC ", type: "SUNY", homepageUrl: "https://www.sunybroome.edu/", imageUrl: "https://broomehornets.com/assets/Primary_Logo_-_.5x.png" },
+            { lat: 43.2105, lng: -77.9508, name: "SUNY Brockport", type: "SUNY", homepageUrl: "https://www.brockport.edu/", imageUrl: "https://www.brockport.edu/live/files/7350-bptlogoallinonecolorjpeg" },
+            { lat: 42.9321, lng: -78.8836, name: "SUNY Buffalo State", type: "SUNY", homepageUrl: "https://suny.buffalostate.edu/", imageUrl: "https://upload.wikimedia.org/wikipedia/en/6/68/Buffalo_suny_seal.png" },
+            { lat: 44.603333, lng: -75.183333, name: "SUNY Canton", type: "SUNY", homepageUrl: "https://www.canton.edu/", imageUrl: "https://upload.wikimedia.org/wikipedia/commons/thumb/9/9d/SUNY_Canton_logo.svg/2560px-SUNY_Canton_logo.svg.png" },
+            { lat: 42.945079, lng: -76.542783, name: "SUNY Cayuga CC ", type: "SUNY", homepageUrl: "https://www.cayuga-cc.edu/", imageUrl: "https://www.suny.edu/media/suny/content-assets/images/campus-profiles/logos/cayuga.jpg" },
+            { lat: 44.6483, lng: -73.4399, name: "SUNY Clinton CC ", type: "SUNY", homepageUrl: "https://www.clinton.edu/", imageUrl: "https://www.suny.edu/media/suny/content-assets/images/campus-profiles/logos/clinton.jpg" },
+            { lat: 42.673, lng: -74.4984, name: "SUNY Cobleskill", type: "SUNY", homepageUrl: "https://www.cobleskill.edu/", imageUrl: "https://adpi.org/wp-content/uploads/2024/05/SUNY-Cobleskill.png" },
+            { lat: 42.2175, lng: -73.818, name: "SUNY Columbia-Greene CC", type: "SUNY", homepageUrl: "https://www.sunycgcc.edu/", imageUrl: "https://www.suny.edu/media/suny/content-assets/images/campus-profiles/logos/columbia-greene.jpg" },
+            { lat: 42.1173, lng: -77.0735, name: "SUNY Corning CC", type: "SUNY", homepageUrl: "https://www.corning-cc.edu/", imageUrl: "https://upload.wikimedia.org/wikipedia/commons/e/ea/Suny-corning-logo-header.png" },
+            { lat: 42.4482, lng: -76.4794, name: "SUNY Cornell CALS", type: "SUNY", homepageUrl: "https://cals.cornell.edu/", imageUrl: "https://cals.cornell.edu/sites/default/files/styles/image_callout_wide/public/2019-08/wordmark-primary-2.png?h=c448c513&itok=fr8oNTwl" },
+            { lat: 42.4475, lng: -76.4649, name: "SUNY Cornell CVM ", type: "SUNY", homepageUrl: "https://www.vet.cornell.edu/", imageUrl: "https://cdn.prod.website-files.com/62c8f3d1903d341ce3fe3362/631e1a003bcb9cddf02c2b9e_2C%20on%20W.svg" },
+            { lat: 42.4497, lng: -76.479, name: "SUNY Cornell HumEc ", type: "SUNY", homepageUrl: "https://www.human.cornell.edu/", imageUrl: "https://www.suny.edu/media/suny/content-assets/images/campus-profiles/logos/cornell-ecology.jpg" },
+            { lat: 42.4485, lng: -76.4786, name: "SUNY Cornell ILR ", type: "SUNY", homepageUrl: "https://www.ilr.cornell.edu/", imageUrl: "https://www.suny.edu/media/suny/content-assets/images/campus-profiles/logos/Cornell-ILR-logo.jpg" },
+            { lat: 42.5990, lng: -76.1878, name: "SUNY Cortland", type: "SUNY", homepageUrl: "https://www2.cortland.edu/", imageUrl: "https://www2.cortland.edu/offices/publications/big/images/sc-primary.png" },
+            { lat: 42.2706, lng: -74.9247, name: "SUNY Delhi", type: "SUNY", homepageUrl: "https://www.delhi.edu/", imageUrl: "https://www.delhi.edu/about/college-relations/style-guide/logo_files_2022/rgb/suny_delhi_logo_rgb_2022.png" },
+            { lat: 40.6554, lng: -73.9457, name: "SUNY Downstate Medical Center", type: "SUNY", homepageUrl: "https://www.downstate.edu/", imageUrl: "https://www.downstate.edu/news-events/communications-marketing/new-media-services/_images/_logos/png/primary_logo.png" },
+            { lat: 41.7249, lng: -73.9043, name: "SUNY Dutchess CC", type: "SUNY", homepageUrl: "https://www.sunydutchess.edu/", imageUrl: "https://www.suny.edu/media/suny/content-assets/images/campus-profiles/logos/dutchess.jpg" },
+            { lat: 43.0348, lng: -76.1355, name: "SUNY ESF", type: "SUNY", homepageUrl: "https://www.esf.edu/", imageUrl: "https://upload.wikimedia.org/wikipedia/en/9/9b/Sunyesfcrest.png" },
+            { lat: 43.0779, lng: -73.8058, name: "SUNY Empire", type: "SUNY", homepageUrl: "https://www.sunyempire.edu/", imageUrl: "https://sunyempire.edu/media/enrollment-management/marketing/new-logos/T4Mockups-Logo-Stacked-Color-1.png" },
+            { lat: 42.9593, lng: -78.7215, name: "SUNY Erie CC", type: "SUNY", homepageUrl: "https://www.ecc.edu/", imageUrl: "https://www.ecc.edu/_resources/assets/img/logo-red.svg" },
+            { lat: 40.7529, lng: -73.4267, name: "SUNY Farmingdale, SUNY", type: "SUNY", homepageUrl: "https://www.farmingdale.edu/", imageUrl: "https://upload.wikimedia.org/wikipedia/en/thumb/e/eb/SUNY_Farmingdale_seal.svg/1200px-SUNY_Farmingdale_seal.svg.png" },
+            { lat: 40.7467, lng: -73.9942, name: "SUNY Fashion Institue of Technology ", type: "SUNY", homepageUrl: "https://www.fitnyc.edu/", imageUrl: "https://www.fitnyc.edu/images/cer/fit-master-brand-wordmark-2-line.jpg" },
+            { lat: 42.8724, lng: -77.2429, name: "SUNY Finger Lakes CC", type: "SUNY", homepageUrl: "https://www.flcc.edu/", imageUrl: "https://www.suny.edu/media/suny/content-assets/images/campus-profiles/logos/fingerlakes.jpg" },
+            { lat: 42.4532, lng: -79.3407, name: "SUNY Fredonia", type: "SUNY", homepageUrl: "https://www.fredonia.edu/", imageUrl: "https://www.wrfalp.com/wp-content/uploads/2014/06/Logo_Stacked_RGB.jpg" },
+            { lat: 42.9842, lng: -74.2946, name: "SUNY Fulton-Montgomery CC", type: "SUNY", homepageUrl: "https://www.fmcc.edu/", imageUrl: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRNbFa4BgHSFLgQwgX_j-tPfnN8Bzeq1y3ptg&s" },
+            { lat: 42.7960, lng: -77.8239, name: "SUNY Geneseo", type: "SUNY", homepageUrl: "https://www.geneseo.edu/", imageUrl: "https://www.geneseo.edu/sites/default/files/styles/news_article/public/sites/news/geneseo-logo-v1.jpg?itok=vOjU7lMk" },
+            { lat: 43.0159, lng: -78.1404, name: "SUNY Genesee CC", type: "SUNY", homepageUrl: "https://www.genesee.edu/", imageUrl: "https://upload.wikimedia.org/wikipedia/commons/7/71/SUNY_Genesee_Community_College_Logo.png" },
+            { lat: 43.0423, lng: -75.0009, name: "SUNY Herkimer CC", type: "SUNY", homepageUrl: "https://www.herkimer.edu/", imageUrl: "https://www.herkimer.edu/assets/Uploads/site-og.png" },
+            { lat: 42.6958, lng: -73.6835, name: "SUNY Hudson Valley CC", type: "SUNY", homepageUrl: "https://www.hvcc.edu/", imageUrl: "https://acadweb.hvcc.edu/~j.hamilton/HVCClogo_green.jpg" },
+            { lat: 42.1132, lng: -78.4299, name: "SUNY Jamestown CC", type: "SUNY", homepageUrl: "https://www.sunyjcc.edu/", imageUrl: "https://www.sunyjcc.edu/sites/default/files/brand/Brand-Logo-SUNY2c.png" },
+            { lat: 43.988430, lng: -75.938959, name: "SUNY Jefferson CC", type: "SUNY", homepageUrl: "https://www.sunyjefferson.edu/", imageUrl: "https://upload.wikimedia.org/wikipedia/commons/thumb/3/3f/Jefferson_Community_College_Logo_SUNY.svg/512px-Jefferson_Community_College_Logo_SUNY.svg.png?20220204202922" },
+            { lat: 40.8053, lng: -73.7925, name: "SUNY Maritime", type: "SUNY", homepageUrl: "https://www.sunymaritime.edu/", imageUrl: "https://seekvectorlogo.net/wp-content/uploads/2020/01/maritime-college-state-university-of-new-york-vector-logo.png" },
+            { lat: 43.0775, lng: -75.2175, name: "SUNY Mohawk Valley CC", type: "SUNY", homepageUrl: "https://www.mvcc.edu/", imageUrl: "https://upload.wikimedia.org/wikipedia/commons/3/38/Mvcclogo.png" },
+            { lat: 43.1019, lng: -77.6144, name: "SUNY Monroe CC", type: "SUNY", homepageUrl: "https://www.monroecc.edu/", imageUrl: "https://www.suny.edu/media/suny/content-assets/images/campus-profiles/logos/monroe.jpg" },
+            { lat: 42.8985, lng: -75.6477, name: "SUNY Morrisville", type: "SUNY", homepageUrl: "https://www.morrisville.edu/", imageUrl: "https://www.morrisville.edu/sites/default/files/Morrisville_Identity_Mustang_SUNY%20Morrisville_RGB_0.png" },
+            { lat: 40.7299, lng: -73.5922, name: "SUNY Nassau CC", type: "SUNY", homepageUrl: "https://www.ncc.edu/", imageUrl: "https://www.ncc.edu/aboutncc/ourpeople/administration/institutional_advancement/logos/NCCWeb.jpg" },
+            { lat: 41.7386, lng: -74.0852, name: "SUNY New Paltz", type: "SUNY", homepageUrl: "https://www.newpaltz.edu/", imageUrl: "https://www.newpaltz.edu/media/ocm/toolkit/the-new-paltz-brand/vdp_pg13-2415x873.jpg" },
+            { lat: 43.146, lng: -78.8787, name: "SUNY Niagara CC", type: "SUNY", homepageUrl: "https://www.niagaracc.suny.edu/", imageUrl: "https://upload.wikimedia.org/wikipedia/commons/2/2b/SUNY_Niagara_logo.jpg" },
+            { lat: 44.3192, lng: -74.1196, name: "SUNY North Country CC", type: "SUNY", homepageUrl: "https://www.nccc.edu/", imageUrl: "https://www.suny.edu/media/suny/content-assets/images/campus-profiles/logos/northcountry.jpg" },
+            { lat: 42.253260, lng: -77.787490, name: "SUNY NYSCC @ Alfred University ", type: "SUNY", homepageUrl: "https://www.alfred.edu/academics/colleges-schools/college-ceramics/index.cfm", imageUrl: "x" },
+            { lat: 40.7971, lng: -73.5718, name: "SUNY Old Westbury", type: "SUNY", homepageUrl: "https://www.oldwestbury.edu/", imageUrl: "https://sunyempire.edu/media/partnerships/images/NCCC_LOGO_PACKAGE_RGB-05-(002)-(002).jpg" },
+            { lat: 43.006167, lng: -76.197306, name: "SUNY Onondaga CC", type: "SUNY", homepageUrl: "https://www.sunyocc.edu/", imageUrl: "https://www.suny.edu/media/suny/content-assets/images/campus-profiles/logos/onondaga.jpg" },
+            { lat: 40.7544, lng: -73.9823, name: "SUNY Optometry", type: "SUNY", homepageUrl: "https://www.sunyopt.edu/", imageUrl: "https://www.sunyopt.edu/wp-content/uploads/2019/11/SUNY-Logo-Centered.png" },
+            { lat: 41.4399, lng: -74.4269, name: "SUNY Orange CC", type: "SUNY", homepageUrl: "https://sunyorange.edu/", imageUrl: "https://hvcu2022.wellnessiq.org/wp-content/uploads/sites/42/2022/06/suny-orange-community-college-logo.png" },
+            { lat: 43.4509, lng: -76.5434, name: "SUNY Oswego", type: "SUNY", homepageUrl: "https://www.oswego.edu/", imageUrl: "https://acrl.ala.org/residency/wp-content/uploads/2017/07/oswego_logo_vert_grn.jpg" },
+            { lat: 44.6926, lng: -73.4669, name: "SUNY Plattsburgh", type: "SUNY", homepageUrl: "https://www.plattsburgh.edu/", imageUrl: "https://upload.wikimedia.org/wikipedia/en/thumb/6/6b/SUNY_Plattsburgh_seal.svg/1200px-SUNY_Plattsburgh_seal.svg.png" },
+            { lat: 43.1375, lng: -75.2273, name: "SUNY Poly", type: "SUNY", homepageUrl: "https://sunypoly.edu/", imageUrl: "https://www.suny.edu/media/suny/content-assets/images/campus-profiles/logos/SUNY-Poly-logo-new.jpg" },
+            { lat: 44.6615, lng: -74.9730, name: "SUNY Potsdam", type: "SUNY", homepageUrl: "https://www.potsdam.edu/", imageUrl: "https://www.potsdam.edu/sites/default/files/potsdam_red.jpg" },
+            { lat: 41.0471, lng: -73.7004, name: "SUNY Purchase", type: "SUNY", homepageUrl: "https://www.purchase.edu/", imageUrl: "https://www.purchase.edu/live/files/5278-purchase-logo-purple-cmyk-jpg" },
+            { lat: 41.1324, lng: -74.0874, name: "SUNY Rockland CC", type: "SUNY", homepageUrl: "https://sunyrockland.edu/", imageUrl: "https://www.suny.edu/media/suny/content-assets/images/campus-profiles/logos/rockland.jpg" },
+            { lat: 40.9041, lng: -73.1238, name: "SUNY SBU", type: "SUNY", homepageUrl: "https://www.stonybrook.edu/", imageUrl: "https://www.master-of-finance.org/wp-content/uploads/2018/07/stony-brook-university-300x250.png" },
+            { lat: 42.8145, lng: -73.9508, name: "SUNY Schenectady CC", type: "SUNY", homepageUrl: "https://sunysccc.edu/", imageUrl: "https://sunysccc.edu/images/About%20Us/Marketing/SUNY%20Schenectady%20CC%20stacked.png" },
+            { lat: 40.8484, lng: -73.0562, name: "SUNY Suffolk County CC", type: "SUNY", homepageUrl: "https://www.sunysuffolk.edu/", imageUrl: "https://www.sunysuffolk.edu/about-suffolk/office-of-planning-and-institutional-effectiveness/wp-content/uploads/2022/04/sccc-logo-large-2x-001489-1030x313.png" },
+            { lat: 41.7688, lng: -74.6675, name: "SUNY Sullivan CC", type: "SUNY", homepageUrl: "https://sunysullivan.edu/", imageUrl: "https://sunysullivan.edu/wp-content/uploads/2020/12/cropped-SUNY-sullivan-logo.png" },
+            { lat: 42.5037, lng: -76.2908, name: "SUNY Tompkins Cortland CC", type: "SUNY", homepageUrl: "https://www.tompkinscortland.edu/", imageUrl: "https://www.suny.edu/media/suny/content-assets/images/campus-profiles/logos/tompkinscortland.jpg" },
+            { lat: 43.0018, lng: -78.7895, name: "SUNY UBuffalo", type: "SUNY", homepageUrl: "https://www.buffalo.edu/", imageUrl: "https://upload.wikimedia.org/wikipedia/commons/6/60/University_at_Buffalo_logo.png" },
+            { lat: 41.8529, lng: -74.1312, name: "SUNY Ulster CC", type: "SUNY", homepageUrl: "https://www.sunyulster.edu/", imageUrl: "https://inside.sunyulster.edu/identity/images/2020-suny-ulster-logo/2020-suny-ulster-logo-blue/2020-suny-ulster-logo-blue.jpg" },
+            { lat: 43.042029, lng: -76.139620, name: "SUNY Upstate Medical University", type: "SUNY", homepageUrl: "https://www.upstate.edu/", imageUrl: "https://images.credly.com/images/05f82a1e-f836-4dff-be75-ddfd20b5f4d6/blob.png" },
+            { lat: 41.0667, lng: -73.7903, name: "SUNY Westchester CC", type: "SUNY", homepageUrl: "https://www.sunywcc.edu/", imageUrl: "https://www.sunywcc.edu/CMS/wp-content/uploads/style-guide/web-images/logo-sunywcc.jpg" }
+        ];
+
+
+        const cunyCampuses = [
+            { lat: 40.7179, lng: -74.0120, name: "CUNY Borough of Manhattan CC", type: "CUNY", homepageUrl: "https://www.bmcc.cuny.edu/", imageUrl: "https://bmccprodstroac.blob.core.windows.net/uploads/2022/01/logo-2line-300x195.jpg" },
+            { lat: 40.8575, lng: -73.9129, name: "CUNY Bronx CC", type: "CUNY", homepageUrl: "https://www.bcc.cuny.edu/", imageUrl: "https://www.bcc.cuny.edu/wp-content/uploads/2019/03/bcc-logo-in-outlines.png" },
+            { lat: 40.6309, lng: -73.9515, name: "CUNY Brooklyn College", type: "CUNY", homepageUrl: "https://www.brooklyn.cuny.edu/", imageUrl: "https://upload.wikimedia.org/wikipedia/commons/thumb/4/43/Brooklyn_College_Logo.svg/2560px-Brooklyn_College_Logo.svg.png" },
+            { lat: 40.8194, lng: -73.9500, name: "CUNY City College", type: "CUNY", homepageUrl: "https://www.ccny.cuny.edu/", imageUrl: "https://www.ccny.cuny.edu/sites/default/files/2022-06/RGB_CNNY_Horizontal_Version_P2665C.png" },
+            { lat: 40.6954, lng: -73.9875, name: "CUNY CityTech", type: "CUNY", homepageUrl: "https://www.citytech.cuny.edu/", imageUrl: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRUufVAsr5OrhWvrcJBkbSFf18LdVVP30wWug&s" },
+            { lat: 40.6022, lng: -74.1504, name: "CUNY College of Staten Island", type: "CUNY", homepageUrl: "https://www.csi.cuny.edu/", imageUrl: "https://academicworks.cuny.edu/assets/md5images/514e3c424d39651db69ee26172128457.jpg" },
+            { lat: 40.7486, lng: -73.9840, name: "CUNY Graduate Center", type: "CUNY", homepageUrl: "https://www.gc.cuny.edu/", imageUrl: "https://user-content.givegab.com/uploads/group/logo/437311/99c913fca0b82ca16053500349fdab517d93f481.png" },
+            { lat: 40.8174, lng: -73.9272, name: "CUNY Hostos CC", type: "CUNY", homepageUrl: "https://www.hostos.cuny.edu/", imageUrl: "https://www.hostos.cuny.edu/getmedia/6221fdfa-4f8f-4d9e-9a69-bcf2776bc29f/Brand-Asset_Hostos-CUNY-Pri-HOR_1.aspx;.gif;;?width=250&height=144" },
+            { lat: 40.7678, lng: -73.9645, name: "CUNY Hunter College", type: "CUNY", homepageUrl: "https://hunter.cuny.edu/", imageUrl: "https://upload.wikimedia.org/wikipedia/commons/9/98/Hunter_college_logo.png" },
+            { lat: 40.7707, lng: -73.9892, name: "CUNY John Jay College of Criminal Justice", type: "CUNY", homepageUrl: "https://www.jjay.cuny.edu/", imageUrl: "https://www.jjay.cuny.edu/sites/default/files/2023-12/JJC_CUNY_text_Logo_RGB.png" },
+            { lat: 40.5787, lng: -73.9351, name: "CUNY Kingsborough CC", type: "CUNY", homepageUrl: "https://www.kbcc.cuny.edu/", imageUrl: "https://web.hypothes.is/wp-content/uploads/2024/01/kbcc-logo-CUNY.png" },
+            { lat: 40.7438, lng: -73.9351, name: "CUNY LaGuardia CC", type: "CUNY", homepageUrl: "https://www.laguardia.edu/", imageUrl: "https://apps.laguardia.edu/directory/imgs/LAGCC_logo_update.png" },
+            { lat: 40.8729, lng: -73.8945, name: "CUNY Lehman College", type: "CUNY", homepageUrl: "https://www.lehman.cuny.edu/", imageUrl: "https://www.lehman.cuny.edu/media/Lehman-College-Website/Site-Assets-2021/Images/LehmanLogo_BlueGreen.png" },
+            { lat: 40.6664, lng: -73.9571, name: "CUNY Medgar Evers College", type: "CUNY", homepageUrl: "https://www.mec.cuny.edu/", imageUrl: "https://www.mec.cuny.edu/wp-content/uploads/2023/12/booklogo_blackgold-e1681495464947.png" },
+            { lat: 40.7367, lng: -73.8203, name: "CUNY Queens College", type: "CUNY", homepageUrl: "https://www.qc.cuny.edu/", imageUrl: "https://www.qc.cuny.edu/communications/wp-content/uploads/sites/21/2021/07/New-Lockup-1.jpg" },
+            { lat: 40.7554, lng: -73.7574, name: "CUNY Queensborough CC", type: "CUNY", homepageUrl: "https://www.qcc.cuny.edu/", imageUrl: "https://qcctigers.com/images/2021/10/1/QCC.png" },
+            { lat: 40.7010, lng: -73.7961, name: "CUNY York College", type: "CUNY", homepageUrl: "https://www.york.cuny.edu/", imageUrl: "https://academicworks.cuny.edu/assets/md5images/f72b9a39e9b23884076a8f351cbc6fe0.png" }
+        ];
+
+
+        const ivycampuses = [
+            { lat: 41.826820, lng: -71.402931, name: "Brown University", type: "Ivy League", homepageUrl: "https://www.brown.edu/", imageUrl: "https://thebruinclub.wordpress.com/wp-content/uploads/2013/11/brown_logo.gif" },
+            { lat: 40.807384, lng: -73.963036, name: "Columbia University", type: "Ivy League", homepageUrl: "https://www.columbia.edu/", imageUrl: "https://upload.wikimedia.org/wikipedia/commons/thumb/b/b0/Columbia_coat_of_arms_no_crest.svg/640px-Columbia_coat_of_arms_no_crest.svg.png" },
+            { lat: 42.454323, lng: -76.475266, name: "Cornell University", type: "Ivy League", homepageUrl: "https://www.cornell.edu/", imageUrl: "https://images.seeklogo.com/logo-png/19/2/cornell-university-logo-png_seeklogo-190243.png" },
+            { lat: 43.704540, lng: -72.288986, name: "Dartmouth College", type: "Ivy League", homepageUrl: "https://home.dartmouth.edu/", imageUrl: "https://logolook.net/wp-content/uploads/2024/04/Dartmouth-College-Logo.png" },
+            { lat: 42.374443, lng: -71.116943, name: "Harvard University", type: "Ivy League", homepageUrl: "https://www.harvard.edu/", imageUrl: "https://upload.wikimedia.org/wikipedia/commons/thumb/c/cc/Harvard_University_coat_of_arms.svg/1200px-Harvard_University_coat_of_arms.svg.png" },
+            { lat: 40.343899, lng: -74.660049, name: "Princeton University", type: "Ivy League", homepageUrl: "https://www.princeton.edu/", imageUrl: "https://upload.wikimedia.org/wikipedia/commons/thumb/d/d0/Princeton_seal.svg/1200px-Princeton_seal.svg.png" },
+            { lat: 39.952305, lng: -75.193703, name: "University of Pennsylvania", type: "Ivy League", homepageUrl: "https://www.upenn.edu/", imageUrl: "https://branding.web-resources.upenn.edu/sites/default/files/styles/card_3x2/public/2022-03/UniversityofPennsylvania_Shield_RGB-2.png?h=3c287ac3&itok=HgG1DNc-" },
+            { lat: 41.316307, lng: -72.922585, name: "Yale University", type: "Ivy League", homepageUrl: "https://www.yale.edu/", imageUrl: "https://upload.wikimedia.org/wikipedia/commons/thumb/6/6e/Yale_University_logo.svg/500px-Yale_University_logo.svg.png" },
+        ];
+
+      
+        const shs = [
+            { lat: 40.878330, lng: -73.890830, name: "The Bronx High School of Science", type: "Specialized HS", homepageUrl: "https://www.bxscience.edu/", imageUrl: "https://upload.wikimedia.org/wikipedia/en/7/70/BxSci_Logo_New.jpg" },
+            { lat: 40.705000, lng: -73.938890, name: "The Brooklyn Latin School", type: "Specialized HS", homepageUrl: "https://www.brooklynlatin.org/", imageUrl: "https://upload.wikimedia.org/wikipedia/en/5/5b/Brooklyn_Latin_School_Logo.png" },
+            { lat: 40.688890, lng: -73.976940, name: "Brooklyn Technical High School", type: "Specialized HS", homepageUrl: "https://www.bths.edu/", imageUrl: "https://upload.wikimedia.org/wikipedia/en/9/9b/Bthslogo.JPG" },
+            { lat: 40.774170, lng: -73.985560, name: "Fiorello H. LaGuardia High School of Music & Art and Performing Arts", type: "Specialized HS", homepageUrl: "https://www.laguardiahs.org/", imageUrl: "https://www.laguardiahs.org/favicon.ico" },
+            { lat: 40.821290, lng: -73.948676, name: "High School for Mathematics, Science and Engineering at City College of New York", type: "Specialized HS", homepageUrl: "https://www.hsmse.org/", imageUrl: "https://www.hsmse.org/pics/school_logo.png" },
+            { lat: 40.874834, lng: -73.895187, name: "High School of American Studies at Lehman College", type: "Specialized HS", homepageUrl: "https://www.hsas-lehman.org/", imageUrl: "https://hsas-lehman.org/wp-content/uploads/2022/10/HSAS-Logo-600.png" },
+            { lat: 40.699000, lng: -73.797000, name: "Queens High School for the Sciences at York College", type: "Specialized HS", homepageUrl: "https://www.qhss.org/", imageUrl: "https://upload.wikimedia.org/wikipedia/en/3/37/QHSSYCLOGO.jpg" },
+            { lat: 40.567928, lng: -74.115328, name: "Staten Island Technical High School", type: "Specialized HS", homepageUrl: "https://www.sitechhs.com/", imageUrl: "https://cdn.sanity.io/images/7i1ps9pf/production/4bc60f90601ca06a1aa19776bb73e009363daec9-750x750.jpg" },
+            { lat: 40.717900, lng: -74.013800, name: "Stuyvesant High School", type: "Specialized HS", homepageUrl: "https://stuy.enschool.org/", imageUrl: "https://upload.wikimedia.org/wikipedia/en/4/49/Stuyvesant_High_School_logo.svg" }
+        ];
+
+        const nest = [
+        { lat: 40.7198, lng: -73.9792, name: "New Explorations into Science, Technology and Math (NEST+m)", type: "NEST+m", homepageUrl: "https://nestmk12.net/", imageUrl: "https://lumatehealth.com/wp-content/uploads/2024/01/nest-m-school-logo.png" },
+        ]
+
+        const allData = [...collegeData, ...sunyCampuses, ...cunyCampuses, ...ivycampuses, ...shs, ...nest,];
+
+        const personColors = { "Norman": "#FF5733" };
+        const typeColors = {
+            "SUNY": "#00DDFF",
+            "CUNY": "#0033A1",
+            "Ivy League": "#006934",
+            "Specialized HS": "#FF9A30",
+            "NEST+m": "#68428A"
+        };
+        const defaultMarkerColor = "#808080";
+
         function initMap() {
-            console.log("Google Maps API loaded. Initializing map...");
-
-            // Define map options
+            console.log("Initializing map...");
             const mapOptions = {
-                center: { lat: 41.4, lng: -74.9 },
-                zoom: 8,
-                zoomControl: true,
-                scrollwheel: true,
-                disableDoubleClickZoom: true,
-                draggable: true,
-                streetViewControl: true,
-                fullscreenControl: true,
-                mapTypeControl: true, // Keep this true to show Map/Satellite
-                mapTypeId: 'roadmap'
+
+                center: { lat: 41.8, lng: -74.5 },
+                zoom: 6,
+                mapTypeControlOptions: {
+
+                    position: google.maps.ControlPosition.TOP_RIGHT
+                 }
             };
-
-            // Create the map instance
             const map = new google.maps.Map(document.getElementById("map"), mapOptions);
-
-            // --- 3. Add Markers and InfoWindows ---
             const infowindow = new google.maps.InfoWindow();
 
-            collegeData.forEach(college => {
-                if (!college.imageUrl) {
-                    console.warn(`Missing imageUrl for ${college.name}`);
-                }
-                const marker = new google.maps.Marker({
-                    position: { lat: college.lat, lng: college.lng },
-                    map: map,
-                    title: `${college.name} (Attended by ${college.person})`
-                });
+            allData.forEach(item => {
+                let markerColor;
+                let infoWindowIdentifier;
 
+                if (item.person) {
+                    markerColor = personColors[item.person] || defaultMarkerColor;
+                    infoWindowIdentifier = `Attended by: ${item.person}`;
+                } else if (item.type && typeColors[item.type]) {
+                    markerColor = typeColors[item.type];
+                    infoWindowIdentifier = `<span class="info-window-type">Type: ${item.type}</span>`;
+                } else {
+                    markerColor = defaultMarkerColor;
+                    infoWindowIdentifier = `<span class="info-window-type">Type: Other/Unknown</span>`;
+                }
+                const markerIcon = {
+                    path: google.maps.SymbolPath.CIRCLE,
+                    fillColor: markerColor,
+                    fillOpacity: 0.9,
+                    strokeColor: '#ffffff',
+                    strokeWeight: 1.0,
+                    scale: 7
+                };
+                const marker = new google.maps.Marker({
+                    position: { lat: item.lat, lng: item.lng },
+                    map: map,
+                    title: item.name,
+                    icon: markerIcon
+                });
                 marker.addListener("click", () => {
-                    const imageHtml = college.imageUrl
-                        ? `<img src="${college.imageUrl}" alt="${college.name} photo">`
-                        : '<p><small>No image available</small></p>';
-                    const contentString = `
-                        <div class="info-window-content">
-                            <b>${college.name}</b>
-                            Attended by: ${college.person}
-                            ${imageHtml}
-                        </div>`;
+                    let contentString = `<div class="info-window-content">`;
+                    const targetUrl = item.homepageUrl || '#';
+                    const openInNewTab = item.homepageUrl ? 'target="_blank"' : '';
+
+                    if (item.imageUrl) {
+                         contentString += `<a href="${targetUrl}" ${openInNewTab}><img src="${item.imageUrl}" alt="${item.name} photo"></a>`;
+                    }
+
+                    if (item.homepageUrl) {
+                        contentString += `<a href="${targetUrl}" ${openInNewTab}><b>${item.name}</b></a>`;
+                    } else {
+                        contentString += `<b>${item.name}</b>`;
+                    }
+
+                    contentString += `<br>${infoWindowIdentifier}`;
+                    contentString += `</div>`;
                     infowindow.setContent(contentString);
                     infowindow.open(map, marker);
                 });
             });
 
-            // --- 4. Add Custom Description Control ---
-            // Create the div element for the control
             const descriptionControlDiv = document.createElement('div');
-            // Assign the CSS class for styling
             descriptionControlDiv.classList.add('map-description-control');
-            // Set the text content
-            descriptionControlDiv.innerHTML = 'This is my college map of people I know.';
-
-            // Add the control to the map.
-            // map.controls is an array of controls for each position.
-            // We push our div onto the array for the TOP_LEFT position.
+            descriptionControlDiv.innerHTML = 'Northeast Schools Map';
+            descriptionControlDiv.style.boxSizing = 'border-box';
             map.controls[google.maps.ControlPosition.TOP_LEFT].push(descriptionControlDiv);
-            // --- End of Custom Control Code ---
 
-             console.log("Map initialized and markers added. Custom control added.");
+            const legendControlDiv = document.createElement('div');
+            legendControlDiv.classList.add('map-legend-control');
+            const legendTitle = document.createElement('h4');
+            legendTitle.innerHTML = 'Legend';
+            legendControlDiv.appendChild(legendTitle);
 
-        } // End of initMap function
+            for (const personName in personColors) {
+                if (personColors.hasOwnProperty(personName)) {
+                    const color = personColors[personName];
+                    const item = document.createElement('div'); item.classList.add('legend-item');
+                    const box = document.createElement('span'); box.classList.add('legend-color-box'); box.style.backgroundColor = color;
+                    const text = document.createTextNode(` ${personName}`);
+                    item.appendChild(box); item.appendChild(text);
+                    legendControlDiv.appendChild(item);
+                }
+            }
 
-        // Error handling
-        function gmLoadError() {
-            console.error("Google Maps script failed to load. Check API key and network connection.");
-            document.getElementById("map").innerHTML = "Error loading Google Maps. Please check your API key and network connection.";
+            const sortedTypes = Object.keys(typeColors).sort();
+            sortedTypes.forEach(typeName => {
+                 const color = typeColors[typeName];
+                 const item = document.createElement('div'); item.classList.add('legend-item');
+                 const box = document.createElement('span'); box.classList.add('legend-color-box'); box.style.backgroundColor = color;
+                 const text = document.createTextNode(` ${typeName}`);
+                 item.appendChild(box); item.appendChild(text);
+                 legendControlDiv.appendChild(item);
+            });
+
+            map.controls[google.maps.ControlPosition.LEFT_TOP].push(legendControlDiv);
+
+            let adjusted = false;
+            const observer = new MutationObserver((mutationsList, observerInstance) => {
+                if (adjusted) return;
+                let descAttached = !!descriptionControlDiv.parentNode;
+                if (!descAttached) return;
+
+                 const mapTypeControlContainer = document.querySelector('#map > div > div > div:nth-child(1) > div:nth-child(4)');
+                if (mapTypeControlContainer && mapTypeControlContainer.offsetWidth > 0) {
+                    console.log("MutationObserver: Found potential Map/Sat control container:", mapTypeControlContainer);
+                    try {
+                        const targetWidth = mapTypeControlContainer.offsetWidth;
+                        console.log("MutationObserver: Measured Map/Sat Width:", targetWidth);
+                        if (targetWidth > 0) {
+                            descriptionControlDiv.style.display = 'block';
+                            descriptionControlDiv.style.boxSizing = 'border-box';
+
+                            console.log(`MutationObserver: SUCCESS: Found Map/Sat width ${targetWidth}px (Width match commented out due to different corners)`);
+                            adjusted = true;
+                            observerInstance.disconnect();
+                            console.log("MutationObserver: Disconnected.");
+                        } else {
+                            console.warn("MutationObserver: Map/Satellite control width is 0. Waiting...");
+                        }
+                    } catch (e) {
+                        console.error("MutationObserver: Error checking description width:", e);
+                        adjusted = true;
+                        observerInstance.disconnect();
+                        console.log("MutationObserver: Disconnected due to error.");
+                    }
+                } else {
+
+                    const mapButton = document.querySelector('#map button[aria-label="Show street map"], #map button[aria-label="Show satellite imagery"]');
+                    if (mapButton && mapButton.offsetWidth > 0) {
+                        const parentContainer = mapButton.closest('div[class*="widget-container"]');
+                        if (parentContainer && parentContainer.offsetWidth > 0) {
+                             const targetWidth = parentContainer.offsetWidth;
+                             console.log(`MutationObserver: Found width via button parent: ${targetWidth}px`);
+
+                            adjusted = true;
+                            observerInstance.disconnect();
+                             console.log("MutationObserver: Disconnected.");
+                        } else {
+                             console.log("MutationObserver: Map/Satellite control button found, but container width is 0 or not found.");
+                        }
+                    } else {
+                         console.log("MutationObserver: Map/Satellite control container/button not found yet.");
+                    }
+                }
+            });
+            observer.observe(document.getElementById('map'), { childList: true, subtree: true });
+            console.log("MutationObserver: Started observing #map.");
+            console.log("Map initialized, controls added.");
         }
 
+        function gmLoadError() {
+            console.error("Google Maps failed to load.");
+            document.getElementById('map').innerHTML = '<p style="padding: 20px; text-align: center; color: red;">Error: Could not load Google Maps. Please check your API key and network connection.</p>';
+         }
     </script>
-
-    <!-- === Load Google Maps API === -->
-    <!-- Remember to use your actual API key and secure it with restrictions -->
-    <!-- Added async based on previous console warning -->
     <script
         src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCVEZB2WjUpEhqnqGjY_zMCQSKUHTdjAWc&callback=initMap&onerror=gmLoadError&v=weekly"
-        async defer
+        async
+        defer
     ></script>
-
 </body>
 </html>
