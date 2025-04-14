@@ -116,26 +116,37 @@
                      <button id="uncheckAllTypesBtn" title="Uncheck all school type filters">Uncheck All</button>
                  </div>
                  <div style="clear: both;"></div>
-                 <!-- Filters added here -->
+                 <!-- Filters added here by JS -->
             </div>
             <div id="school-list-control" class="map-control">
                 <div class="list-header-container">
                     <h4>School List & Visibility</h4>
                     <input type="text" id="schoolSearchInput" placeholder="Search schools...">
                 </div>
-                 <!-- Tip/List added here -->
+                 <!-- Tip/List added here by JS -->
             </div>
         </div>
         <div id="map"></div>
     </div>
 
     <script>
-        // --- Data (Assume all data arrays are present) ---
+        // --- Data ---
         const personColors = { "Norman": "#FF5733" };
-        const typeColors = { "SUNY": "#00DDFF", "CUNY": "#0033A1", "Ivy League": "#006934", "Specialized HS": "#FF9A30", "NEST+m": "#68428A" };
+        // NEW: Added type for "Other Private" and assigned a color
+        const TYPE_OTHER_PRIVATE = "Other Private";
+        const typeColors = {
+            "SUNY": "#00DDFF",
+            "CUNY": "#0033A1",
+            "Ivy League": "#006934",
+            [TYPE_OTHER_PRIVATE]: "#8B4513", // SaddleBrown color for Other Private
+            "Specialized HS": "#FF9A30",
+            "NEST+m": "#68428A"
+        };
         const attendedCategoryName = "Attended by Norman";
         const darkModeStyle = [ { elementType: "geometry", stylers: [{ color: "#242f3e" }] }, { elementType: "labels.text.stroke", stylers: [{ color: "#242f3e" }] }, { elementType: "labels.text.fill", stylers: [{ color: "#746855" }] }, { featureType: "administrative.locality", elementType: "labels.text.fill", stylers: [{ color: "#d59563" }], }, { featureType: "poi", elementType: "labels.text.fill", stylers: [{ color: "#d59563" }], }, { featureType: "poi.park", elementType: "geometry", stylers: [{ color: "#263c3f" }], }, { featureType: "poi.park", elementType: "labels.text.fill", stylers: [{ color: "#6b9a76" }], }, { featureType: "road", elementType: "geometry", stylers: [{ color: "#38414e" }], }, { featureType: "road", elementType: "geometry.stroke", stylers: [{ color: "#212a37" }], }, { featureType: "road", elementType: "labels.text.fill", stylers: [{ color: "#9ca5b3" }], }, { featureType: "road.highway", elementType: "geometry", stylers: [{ color: "#746855" }], }, { featureType: "road.highway", elementType: "geometry.stroke", stylers: [{ color: "#1f2835" }], }, { featureType: "road.highway", elementType: "labels.text.fill", stylers: [{ color: "#f3d19c" }], }, { featureType: "transit", elementType: "geometry", stylers: [{ color: "#2f3948" }], }, { featureType: "transit.station", elementType: "labels.text.fill", stylers: [{ color: "#d59563" }], }, { featureType: "water", elementType: "geometry", stylers: [{ color: "#17263c" }], }, { featureType: "water", elementType: "labels.text.fill", stylers: [{ color: "#515c6d" }], }, { featureType: "water", elementType: "labels.text.stroke", stylers: [{ color: "#17263c" }], }, ];
-        const sunyCampuses = [
+
+        // --- Existing Data Arrays (SUNY, CUNY, Ivy League, SHS, NEST+m) ---
+        const sunyCampuses = [ /* ... SUNNY data remains the same ... */
             { lat: 42.0894, lng: -75.9695, name: "SUNY Binghamton University", person: "Norman", type: "SUNY", imageUrl: "https://pbs.twimg.com/profile_images/601475591918002177/qeftl81n_400x400.png", homepageUrl: "https://www.binghamton.edu/" },
             { lat: 43.3531, lng: -73.6541, name: "SUNY Adirondack CC ", type: "SUNY", homepageUrl: "https://www.sunyacc.edu/", imageUrl: "https://getlogovector.com/wp-content/uploads/2020/01/suny-adirondack-logo-vector.png" },
             { lat: 42.6842, lng: -73.8261, name: "SUNY Albany", type: "SUNY", homepageUrl: "https://www.albany.edu/", imageUrl: "https://www.albany.edu/sites/default/files/UAlbanyMark_F_S01A_HEX_Gold_Black_300ppi_.jpg" },
@@ -158,7 +169,19 @@
             { lat: 40.6554, lng: -73.9457, name: "SUNY Downstate Medical Center", type: "SUNY", homepageUrl: "https://www.downstate.edu/", imageUrl: "https://www.downstate.edu/news-events/communications-marketing/new-media-services/_images/_logos/png/primary_logo.png" },
             { lat: 41.7249, lng: -73.9043, name: "SUNY Dutchess CC", type: "SUNY", homepageUrl: "https://www.sunydutchess.edu/", imageUrl: "https://www.suny.edu/media/suny/content-assets/images/campus-profiles/logos/dutchess.jpg" },
             { lat: 43.0348, lng: -76.1355, name: "SUNY Environmental Science and Forestry (ESF)", type: "SUNY", homepageUrl: "https://www.esf.edu/", imageUrl: "https://upload.wikimedia.org/wikipedia/en/9/9b/Sunyesfcrest.png" },
-            { lat: 43.0779, lng: -73.8058, name: "SUNY Empire", type: "SUNY", homepageUrl: "https://www.sunyempire.edu/", imageUrl: "https://sunyempire.edu/media/enrollment-management/marketing/new-logos/T4Mockups-Logo-Stacked-Color-1.png" },
+            { lat: 43.0779, lng: -73.8058, name: "SUNY Empire (Saratoga Springs)", type: "SUNY", homepageUrl: "https://www.sunyempire.edu/", imageUrl: "https://sunyempire.edu/media/enrollment-management/marketing/new-logos/T4Mockups-Logo-Stacked-Color-1.png" },
+            { lat: 42.13579876281415,  lng: -75.90924658656265, name: "SUNY Empire (Binghamton)", type: "SUNY", homepageUrl: "https://www.sunyempire.edu/", imageUrl: "https://sunyempire.edu/media/enrollment-management/marketing/new-logos/T4Mockups-Logo-Stacked-Color-1.png" },
+            { lat: 40.690518603613704,  lng: -73.9866503376136, name: "SUNY Empire (Brooklyn)", type: "SUNY", homepageUrl: "https://www.sunyempire.edu/", imageUrl: "https://sunyempire.edu/media/enrollment-management/marketing/new-logos/T4Mockups-Logo-Stacked-Color-1.png" },
+            { lat: 42.8906885692423,  lng: -78.75207015426507, name: "SUNY Empire (Buffalo)", type: "SUNY", homepageUrl: "https://www.sunyempire.edu/", imageUrl: "https://sunyempire.edu/media/enrollment-management/marketing/new-logos/T4Mockups-Logo-Stacked-Color-1.png" },
+            { lat: 42.11682577083586,  lng: -77.07601494567966, name: "SUNY Empire (Corning)", type: "SUNY", homepageUrl: "https://www.sunyempire.edu/", imageUrl: "https://sunyempire.edu/media/enrollment-management/marketing/new-logos/T4Mockups-Logo-Stacked-Color-1.png" },
+            { lat: 44.03639410181957,  lng: -75.7776270226233, name: "SUNY Empire (Fort Drum)", type: "SUNY", homepageUrl: "https://www.sunyempire.edu/", imageUrl: "https://sunyempire.edu/media/enrollment-management/marketing/new-logos/T4Mockups-Logo-Stacked-Color-1.png" },
+            { lat: 40.74676102636829, lng: -73.98190043319686, name: "SUNY Empire (Manhattan)", type: "SUNY", homepageUrl: "https://www.sunyempire.edu/", imageUrl: "https://sunyempire.edu/media/enrollment-management/marketing/new-logos/T4Mockups-Logo-Stacked-Color-1.png" },
+            { lat: 41.501100429383094,  lng: -74.00784708721766, name: "SUNY Empire (Newburgh)", type: "SUNY", homepageUrl: "https://www.sunyempire.edu/", imageUrl: "https://sunyempire.edu/media/enrollment-management/marketing/new-logos/T4Mockups-Logo-Stacked-Color-1.png" },
+            { lat: 43.11557750878117,  lng: -77.60419860215335, name: "SUNY Empire (Rochester)", type: "SUNY", homepageUrl: "https://www.sunyempire.edu/", imageUrl: "https://sunyempire.edu/media/enrollment-management/marketing/new-logos/T4Mockups-Logo-Stacked-Color-1.png" },
+            { lat: 40.85020723712226,  lng: -73.04900108033041, name: "SUNY Empire (Selden)", type: "SUNY", homepageUrl: "https://www.sunyempire.edu/", imageUrl: "https://sunyempire.edu/media/enrollment-management/marketing/new-logos/T4Mockups-Logo-Stacked-Color-1.png" },
+            { lat: 40.61005850951833,  lng: -74.17919048476328, name: "SUNY Empire (Staten Island)", type: "SUNY", homepageUrl: "https://www.sunyempire.edu/", imageUrl: "https://sunyempire.edu/media/enrollment-management/marketing/new-logos/T4Mockups-Logo-Stacked-Color-1.png" },
+            { lat: 43.01012946851664,  lng: -76.19005547755863, name: "SUNY Empire (Syracuse)", type: "SUNY", homepageUrl: "https://www.sunyempire.edu/", imageUrl: "https://sunyempire.edu/media/enrollment-management/marketing/new-logos/T4Mockups-Logo-Stacked-Color-1.png" },
+            { lat: 40.92809538640441,  lng: -73.85091183635622, name: "SUNY Empire (Yonkers)", type: "SUNY", homepageUrl: "https://www.sunyempire.edu/", imageUrl: "https://sunyempire.edu/media/enrollment-management/marketing/new-logos/T4Mockups-Logo-Stacked-Color-1.png" },
             { lat: 42.9593, lng: -78.7215, name: "SUNY Erie CC", type: "SUNY", homepageUrl: "https://www.ecc.edu/", imageUrl: "https://www.ecc.edu/_resources/assets/img/logo-red.svg" },
             { lat: 40.7529, lng: -73.4267, name: "SUNY Farmingdale State College", type: "SUNY", homepageUrl: "https://www.farmingdale.edu/", imageUrl: "https://upload.wikimedia.org/wikipedia/en/thumb/e/eb/SUNY_Farmingdale_seal.svg/1200px-SUNY_Farmingdale_seal.svg.png" },
             { lat: 40.7467, lng: -73.9942, name: "SUNY Fashion Institue of Technology ", type: "SUNY", homepageUrl: "https://www.fitnyc.edu/", imageUrl: "https://www.fitnyc.edu/images/cer/fit-master-brand-wordmark-2-line.jpg" },
@@ -201,8 +224,8 @@
             { lat: 43.042029, lng: -76.139620, name: "SUNY Upstate Medical University", type: "SUNY", homepageUrl: "https://www.upstate.edu/", imageUrl: "https://images.credly.com/images/05f82a1e-f836-4dff-be75-ddfd20b5f4d6/blob.png" },
             { lat: 41.0667, lng: -73.7903, name: "SUNY Westchester CC", type: "SUNY", homepageUrl: "https://www.sunywcc.edu/", imageUrl: "https://www.sunywcc.edu/CMS/wp-content/uploads/style-guide/web-images/logo-sunywcc.jpg" },
             { lat: 37.37677960113365, lng: 126.66721043168027, name: "SUNY Korea", type: "SUNY", homepageUrl: "https://www.sunykorea.ac.kr/en/", imageUrl: "https://www.stonybrook.edu/commcms/est/_images/SUNY%20Korea%20Logo%2012.2.png" }
-         ];
-        const cunyCampuses = [
+        ];
+        const cunyCampuses = [ /* ... CUNY data remains the same ... */
             { lat: 40.7404, lng: -73.9832, name: "CUNY Baruch College", person: "Norman", type: "CUNY", imageUrl: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRjeFAV6ipn_I_ijO_HY8NtztoDY3XTt4oRPA&s", homepageUrl: "https://www.baruch.cuny.edu/" },
             { lat: 40.7179, lng: -74.0120, name: "CUNY Borough of Manhattan CC", type: "CUNY", homepageUrl: "https://www.bmcc.cuny.edu/", imageUrl: "https://bmccprodstroac.blob.core.windows.net/uploads/2022/01/logo-2line-300x195.jpg" },
             { lat: 40.8575, lng: -73.9129, name: "CUNY Bronx CC", type: "CUNY", homepageUrl: "https://www.bcc.cuny.edu/", imageUrl: "https://www.bcc.cuny.edu/wp-content/uploads/2019/03/bcc-logo-in-outlines.png" },
@@ -230,7 +253,7 @@
             { lat: 40.774000, lng: -73.980200, name: "CUNY Macauly Honors College", type: "CUNY", homepageUrl: "https://macaulay.cuny.edu/", imageUrl: "https://macaulay.cuny.edu/wp-content/uploads/2018/05/Screenshot-2018-05-18-15.03.54.png" },
             { lat: 40.82106629702918, lng: -73.95034367770154, name: "CUNY School of Medicine", type: "CUNY", homepageUrl: "https://medicine.cuny.edu/", imageUrl: "https://upload.wikimedia.org/wikipedia/commons/3/3e/CUNY_Medicine_logo.png" }
         ];
-        const ivycampuses = [
+        const ivycampuses = [ /* ... Ivy League data remains the same ... */
             { lat: 41.826820, lng: -71.402931, name: "Brown University", type: "Ivy League", homepageUrl: "https://www.brown.edu/", imageUrl: "https://thebruinclub.wordpress.com/wp-content/uploads/2013/11/brown_logo.gif" },
             { lat: 40.807384, lng: -73.963036, name: "Columbia University", type: "Ivy League", homepageUrl: "https://www.columbia.edu/", imageUrl: "https://upload.wikimedia.org/wikipedia/commons/thumb/b/b0/Columbia_coat_of_arms_no_crest.svg/640px-Columbia_coat_of_arms_no_crest.svg.png" },
             { lat: 42.454323, lng: -76.475266, name: "Cornell University", type: "Ivy League", homepageUrl: "https://www.cornell.edu/", imageUrl: "https://images.seeklogo.com/logo-png/19/2/cornell-university-logo-png_seeklogo-190243.png" },
@@ -240,7 +263,12 @@
             { lat: 39.952305, lng: -75.193703, name: "University of Pennsylvania", type: "Ivy League", homepageUrl: "https://www.upenn.edu/", imageUrl: "https://branding.web-resources.upenn.edu/sites/default/files/styles/card_3x2/public/2022-03/UniversityofPennsylvania_Shield_RGB-2.png?h=3c287ac3&itok=HgG1DNc-" },
             { lat: 41.316307, lng: -72.922585, name: "Yale University", type: "Ivy League", homepageUrl: "https://www.yale.edu/", imageUrl: "https://upload.wikimedia.org/wikipedia/commons/thumb/6/6e/Yale_University_logo.svg/500px-Yale_University_logo.svg.png" },
         ];
-        const shs = [
+        // NEW: Data for NYU and NEU
+        const otherPrivateCampuses = [
+             { lat: 40.7295, lng: -73.9965, name: "New York University (NYU)", type: TYPE_OTHER_PRIVATE, homepageUrl: "https://www.nyu.edu/", imageUrl: "https://yt3.ggpht.com/-RZYi5isxH_M/AAAAAAAAAAI/AAAAAAAAAAA/rmWpoe2qZzI/s900-c-k-no/photo.jpg" },
+             { lat: 42.3398, lng: -71.0892, name: "Northeastern University (NEU)", type: TYPE_OTHER_PRIVATE, homepageUrl: "https://www.northeastern.edu/", imageUrl: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQj8Gdl0Gui9xl5q_D4acxRtSg-k4HVkE5dYQ&s" }
+        ];
+        const shs = [ /* ... Specialized HS data remains the same ... */
             { lat: 40.878330, lng: -73.890830, name: "The Bronx High School of Science (Bx Sci)", type: "Specialized HS", homepageUrl: "https://www.bxscience.edu/", imageUrl: "https://upload.wikimedia.org/wikipedia/en/7/70/BxSci_Logo_New.jpg" },
             { lat: 40.70980037964541,  lng: -73.94438497633814, name: "The Brooklyn Latin School (Bk Latin)", type: "Specialized HS", homepageUrl: "https://www.brooklynlatin.org/", imageUrl: "https://upload.wikimedia.org/wikipedia/en/5/5b/Brooklyn_Latin_School_Logo.png" },
             { lat: 40.688890, lng: -73.976940, name: "Brooklyn Technical High School (BTech)", type: "Specialized HS", homepageUrl: "https://www.bths.edu/", imageUrl: "https://upload.wikimedia.org/wikipedia/en/9/9b/Bthslogo.JPG" },
@@ -251,13 +279,35 @@
             { lat: 40.567928, lng: -74.115328, name: "Staten Island Technical High School (SITHS)", type: "Specialized HS", homepageUrl: "https://www.sitechhs.com/", imageUrl: "https://cdn.sanity.io/images/7i1ps9pf/production/4bc60f90601ca06a1aa19776bb73e009363daec9-750x750.jpg" },
             { lat: 40.717900, lng: -74.013800, name: "Stuyvesant High School (Stuy)", type: "Specialized HS", homepageUrl: "https://stuy.enschool.org/", imageUrl: "https://upload.wikimedia.org/wikipedia/en/4/49/Stuyvesant_High_School_logo.svg" }
         ];
-        const nest = [ /* ... NEST+m data ... */ { lat: 40.7198, lng: -73.9792, name: "New Explorations into Science, Technology and Math (NEST+m)", person: "Norman", type: "NEST+m", homepageUrl: "https://nestmk12.net/", imageUrl: "https://lumatehealth.com/wp-content/uploads/2024/01/nest-m-school-logo.png" }, ];
-        const allData = [...sunyCampuses, ...cunyCampuses, ...ivycampuses, ...shs, ...nest];
+        const nest = [ /* ... NEST+m data remains the same ... */
+            { lat: 40.7198, lng: -73.9792, name: "New Explorations into Science, Technology and Math (NEST+m)", person: "Norman", type: "NEST+m", homepageUrl: "https://nestmk12.net/", imageUrl: "https://lumatehealth.com/wp-content/uploads/2024/01/nest-m-school-logo.png" },
+        ];
 
-        const CATEGORY_COLLEGES = "Colleges & Universities";
+        // UPDATED: Combined all data sources including the new 'otherPrivateCampuses'
+        const allData = [...sunyCampuses, ...cunyCampuses, ...ivycampuses, ...otherPrivateCampuses, ...shs, ...nest];
+
+        // NEW: Category Definitions
+        const CATEGORY_PUBLIC = "Public Colleges & Universities";
+        const CATEGORY_PRIVATE = "Private Colleges & Universities";
         const CATEGORY_HIGH_SCHOOLS = "High Schools";
-        const typeToCategoryMap = { "SUNY": CATEGORY_COLLEGES, "CUNY": CATEGORY_COLLEGES, "Ivy League": CATEGORY_COLLEGES, "Specialized HS": CATEGORY_HIGH_SCHOOLS, "NEST+m": CATEGORY_HIGH_SCHOOLS };
-        const categoryOrder = [attendedCategoryName, CATEGORY_COLLEGES, CATEGORY_HIGH_SCHOOLS];
+
+        // UPDATED: Map types to their new top-level categories
+        const typeToCategoryMap = {
+            "SUNY": CATEGORY_PUBLIC,
+            "CUNY": CATEGORY_PUBLIC,
+            "Ivy League": CATEGORY_PRIVATE,
+            [TYPE_OTHER_PRIVATE]: CATEGORY_PRIVATE,
+            "Specialized HS": CATEGORY_HIGH_SCHOOLS,
+            "NEST+m": CATEGORY_HIGH_SCHOOLS
+        };
+
+        // NEW: Define order within Private category for display
+        const privateSubCategoryOrder = ["Ivy League", TYPE_OTHER_PRIVATE];
+        const publicSubCategoryOrder = ["SUNY", "CUNY"]; // For consistency
+        const highSchoolSubCategoryOrder = ["Specialized HS", "NEST+m"]; // For consistency
+
+        // UPDATED: Define the overall order of categories
+        const categoryOrder = [attendedCategoryName, CATEGORY_PUBLIC, CATEGORY_PRIVATE, CATEGORY_HIGH_SCHOOLS];
 
         // --- Global Variables ---
         let map;
@@ -270,20 +320,26 @@
 
         // --- Functions ---
 
-        function processSchoolData(data) { /* ... No change ... */
-            const grouped = {}; const typesFound = new Set(); grouped[attendedCategoryName] = [];
-            data.forEach((school, index) => {
-                const type = school.type || "Unknown"; if (type !== "Unknown") typesFound.add(type);
-                const displayName = school.person ? `${school.name}` : school.name;
-                const schoolEntry = { ...school, displayName: displayName, originalIndex: index, isVisible: true };
-                if (!grouped[type]) grouped[type] = []; grouped[type].push(schoolEntry);
-                if (school.person === "Norman") { grouped[attendedCategoryName].push(schoolEntry); }
-            });
-            typesFound.forEach(type => { if (!grouped[type]) grouped[type] = []; });
-            for (const type in grouped) { grouped[type].sort((a, b) => a.displayName.localeCompare(b.displayName)); }
-            if (grouped[attendedCategoryName].length === 0) delete grouped[attendedCategoryName];
-            return grouped;
-         }
+        function processSchoolData(data) { /* ... No change needed here ... */
+             const grouped = {}; const typesFound = new Set(); grouped[attendedCategoryName] = [];
+             data.forEach((school, index) => {
+                 const type = school.type || "Unknown"; if (type !== "Unknown") typesFound.add(type);
+                 const displayName = school.person ? `${school.name}` : school.name;
+                 const schoolEntry = { ...school, displayName: displayName, originalIndex: index, isVisible: true };
+                 // Ensure the type exists as a key in the grouped object
+                 if (!grouped[type]) grouped[type] = [];
+                 grouped[type].push(schoolEntry);
+                 // Add to attended category if applicable
+                 if (school.person === "Norman") { grouped[attendedCategoryName].push(schoolEntry); }
+             });
+             // Ensure all defined types exist as keys, even if empty
+             Object.keys(typeColors).forEach(type => { if (!grouped[type]) grouped[type] = []; });
+             // Sort schools within each type
+             for (const type in grouped) { grouped[type].sort((a, b) => a.displayName.localeCompare(b.displayName)); }
+             // Remove attended category if empty
+             if (grouped[attendedCategoryName].length === 0) delete grouped[attendedCategoryName];
+             return grouped;
+        }
 
         function updateIndividualCheckboxesForType(typeName, isChecked) { /* ... No change ... */
             console.log(`Setting isVisible for type: ${typeName} to state: ${isChecked}`);
@@ -291,53 +347,120 @@
                 if (!markerInfo || !markerInfo.school) return;
                 const school = markerInfo.school;
                 const typeMatches = school.type === typeName;
+                // Special handling for the attended category - it's not a 'type' but a filter concept
                 const isAttendedMatch = typeName === attendedCategoryName && school.person === "Norman";
+
                 if (typeMatches || isAttendedMatch) {
-                    school.isVisible = isChecked;
+                    // If the filter is for 'Attended', only affect the visibility of Norman's schools
+                    // If the filter is for a specific type (e.g., SUNY), affect all SUNY schools
+                    // This prevents unchecking 'SUNY' from hiding Norman's SUNY school if 'Attended' is checked.
+                    // Logic simplification: Let the individual checkbox handle its state directly.
+                    // The type filter only *sets* the initial/batch state. Individual can override.
+                    // We just need to update the *visual* state of the individual checkboxes here.
+
                     const checkboxId = `school-checkbox-${school.originalIndex}`;
                     const checkboxElement = document.getElementById(checkboxId);
-                    if (checkboxElement) { checkboxElement.checked = isChecked; }
+
+                    // When a *type* filter changes, update corresponding individual checkboxes *and* the school's visibility state
+                    if (typeMatches) {
+                        school.isVisible = isChecked; // Update visibility based on type filter
+                         if (checkboxElement) { checkboxElement.checked = isChecked; }
+                    }
+                    // When the 'Attended' filter changes, update only Norman's schools' checkboxes *and* their visibility
+                    else if (isAttendedMatch) {
+                         school.isVisible = isChecked; // Update visibility based on attended filter
+                         if (checkboxElement) { checkboxElement.checked = isChecked; }
+                    }
                 }
             });
+            // Recalculate marker visibility after potential state changes
+            // updateMarkersVisibility(); // Let the calling function handle this after all types are processed
         }
+
 
         function updateMarkersVisibility() { /* ... No change ... */
             console.log("Updating marker visibility based on school.isVisible state.");
             let visibleCount = 0;
             allMarkers.forEach((markerInfo) => {
                 if (!markerInfo || !markerInfo.marker || !markerInfo.school) return;
-                const isVisible = markerInfo.school.isVisible;
+                const isVisible = markerInfo.school.isVisible; // Read directly from school object
                 markerInfo.marker.setVisible(!!isVisible);
                  if (isVisible) visibleCount++;
             });
             console.log(`${visibleCount} markers are now visible.`);
         }
 
-        function filterSchoolList() { /* ... No change ... */
+
+        function filterSchoolList() { /* ... Existing code ... */
             console.log("Filtering list items based on search term.");
             const searchTerm = document.getElementById('schoolSearchInput').value.toLowerCase().trim();
             const schoolListContainer = document.getElementById('school-list-control');
             const listItems = schoolListContainer.querySelectorAll('ul li');
             const categoryHeadings = schoolListContainer.querySelectorAll('h5.list-category-header, h5.attended-category-header');
             const typeSubHeadings = schoolListContainer.querySelectorAll('h6.type-subheader');
+
+            // Filter individual list items
             listItems.forEach(item => {
                 const nameSpan = item.querySelector('span.school-name');
-                if (nameSpan) { const schoolName = nameSpan.textContent.toLowerCase(); const matchesSearch = searchTerm === '' || schoolName.includes(searchTerm); item.style.display = matchesSearch ? 'flex' : 'none'; } else { item.style.display = 'none'; }
+                if (nameSpan) {
+                    const schoolName = nameSpan.textContent.toLowerCase();
+                    const matchesSearch = searchTerm === '' || schoolName.includes(searchTerm);
+                    item.style.display = matchesSearch ? 'flex' : 'none';
+                } else {
+                    item.style.display = 'none'; // Hide if no name span found
+                }
             });
+
+            // Hide/show type sub-headings based on visible children
             typeSubHeadings.forEach(subHeading => {
-                const list = subHeading.nextElementSibling; let subCategoryHasVisibleItem = false;
-                if (list && list.tagName === 'UL') { const itemsInList = list.querySelectorAll('li'); for (let i = 0; i < itemsInList.length; i++) { if (itemsInList[i].style.display !== 'none') { subCategoryHasVisibleItem = true; break; } } }
+                const list = subHeading.nextElementSibling;
+                let subCategoryHasVisibleItem = false;
+                if (list && list.tagName === 'UL') {
+                    const itemsInList = list.querySelectorAll('li');
+                    for (let i = 0; i < itemsInList.length; i++) {
+                        // Check the *computed* style in case it was hidden by search
+                        if (itemsInList[i].style.display !== 'none') {
+                            subCategoryHasVisibleItem = true;
+                            break;
+                        }
+                    }
+                }
+                 // Also check if the list itself is hidden (e.g. if the whole category is filtered out)
+                 if (list && list.style.display === 'none') subCategoryHasVisibleItem = false;
+
                 subHeading.style.display = subCategoryHasVisibleItem ? 'block' : 'none';
             });
+
+            // Hide/show main category headings based on visible children/sub-headings
             categoryHeadings.forEach(heading => {
-                let nextElement = heading.nextElementSibling; let categoryHasVisibleContent = false;
+                let nextElement = heading.nextElementSibling;
+                let categoryHasVisibleContent = false;
                 while (nextElement && !nextElement.classList.contains('list-category-header') && !nextElement.classList.contains('attended-category-header')) {
-                    if (nextElement.style.display !== 'none') { if ((nextElement.tagName === 'H6') || (nextElement.tagName === 'UL' && nextElement.querySelector('li[style*="display: flex"]'))) { categoryHasVisibleContent = true; break; } }
+                    // Check if the element itself is visible AND if it's a subheader that's visible OR a list with visible items
+                    if (nextElement.style.display !== 'none') {
+                         // Visible subheader?
+                         if (nextElement.tagName === 'H6' && nextElement.style.display !== 'none') {
+                              categoryHasVisibleContent = true;
+                              break;
+                         }
+                         // Visible list with visible items?
+                         if (nextElement.tagName === 'UL' && nextElement.style.display !== 'none') {
+                              const itemsInList = nextElement.querySelectorAll('li');
+                               for (let i = 0; i < itemsInList.length; i++) {
+                                   if (itemsInList[i].style.display !== 'none') {
+                                        categoryHasVisibleContent = true;
+                                        break; // Break inner loop
+                                   }
+                               }
+                               if (categoryHasVisibleContent) break; // Break outer loop
+                         }
+                    }
                     nextElement = nextElement.nextElementSibling;
                 }
                 heading.style.display = categoryHasVisibleContent ? 'block' : 'none';
             });
-         }
+        }
+
 
         function handleListItemClick(event, markerIndex) { /* ... No change ... */
              if (event.target.type === 'checkbox') { return; }
@@ -357,52 +480,36 @@
              }
          }
 
-        // UPDATED: Added more logging
-        function zoomToSelectedSchools() {
-            console.log("zoomToSelectedSchools called."); // LOGGING
-            if (!google || !map) {
-                console.log("Google Maps API or map object not ready."); // LOGGING
-                return;
-            }
-
-            console.log(`Current schoolsSelectedForZoom size: ${schoolsSelectedForZoom.size}`); // LOGGING
-            console.log(`Selected indices: ${[...schoolsSelectedForZoom].join(', ')}`); // LOGGING
-
-            if (schoolsSelectedForZoom.size === 0) {
-                console.log("No schools selected for zoom.");
-                return;
-            }
-
-            const bounds = new google.maps.LatLngBounds();
-            let validPoints = 0;
-
+        function zoomToSelectedSchools() { /* ... No change ... */
+            console.log("zoomToSelectedSchools called.");
+            if (!google || !map) { console.log("Google Maps API or map object not ready."); return; }
+            console.log(`Current schoolsSelectedForZoom size: ${schoolsSelectedForZoom.size}`);
+            console.log(`Selected indices: ${[...schoolsSelectedForZoom].join(', ')}`);
+            if (schoolsSelectedForZoom.size === 0) { console.log("No schools selected for zoom."); return; }
+            const bounds = new google.maps.LatLngBounds(); let validPoints = 0;
             schoolsSelectedForZoom.forEach(index => {
                 const markerInfo = allMarkers[index];
-                if (markerInfo && markerInfo.marker) {
-                    const pos = markerInfo.marker.getPosition();
-                    console.log(`Extending bounds with index ${index} at ${pos}`); // LOGGING
-                    bounds.extend(pos);
-                    validPoints++;
-                } else {
-                     console.log(`Skipping index ${index} - markerInfo or marker not found.`); // LOGGING
-                }
+                if (markerInfo && markerInfo.marker) { const pos = markerInfo.marker.getPosition(); console.log(`Extending bounds with index ${index} at ${pos}`); bounds.extend(pos); validPoints++; } else { console.log(`Skipping index ${index} - markerInfo or marker not found.`); }
             });
-
-            if (validPoints > 0) {
-                console.log(`Calling map.fitBounds for ${validPoints} point(s).`); // LOGGING
-                map.fitBounds(bounds, 50); // 50px padding
-            } else {
-                 console.log("No valid marker positions found to fit bounds."); // LOGGING
-            }
+            if (validPoints > 0) { console.log(`Calling map.fitBounds for ${validPoints} point(s).`); map.fitBounds(bounds, 50); } else { console.log("No valid marker positions found to fit bounds."); }
         }
 
         function initMap() {
             console.log("Initializing map...");
             schoolsByType = processSchoolData(allData);
-            filterState = {}; Object.keys(schoolsByType).forEach(type => filterState[type] = true);
-            if (schoolsByType[attendedCategoryName]) { filterState[attendedCategoryName] = true; }
+            filterState = {};
+            // Initialize filter state for all known types + the attended category
+            Object.keys(schoolsByType).forEach(type => filterState[type] = true);
+            // Note: schoolsByType[attendedCategoryName] might be undefined if Norman attended no schools
+            if (schoolsByType[attendedCategoryName]) {
+                 filterState[attendedCategoryName] = true;
+            } else {
+                 // Ensure the key exists even if empty, consistent with processSchoolData
+                 if (!schoolsByType[attendedCategoryName]) schoolsByType[attendedCategoryName] = [];
+                 filterState[attendedCategoryName] = true; // Default to true, but filter UI won't show if list is empty
+            }
 
-            const mapOptions = { /* ... map options ... */ center: { lat: 41.8, lng: -74.5 }, zoom: 7, mapTypeControlOptions: { position: google.maps.ControlPosition.TOP_RIGHT }, styles: null, fullscreenControl: true, streetViewControl: true, zoomControl: true, mapTypeControl: true, gestureHandling: 'greedy' };
+            const mapOptions = { center: { lat: 41.8, lng: -74.5 }, zoom: 7, mapTypeControlOptions: { position: google.maps.ControlPosition.TOP_RIGHT }, styles: null, fullscreenControl: true, streetViewControl: true, zoomControl: true, mapTypeControl: true, gestureHandling: 'greedy' };
             map = new google.maps.Map(document.getElementById("map"), mapOptions);
             infowindow = new google.maps.InfoWindow();
             schoolsSelectedForZoom = new Set();
@@ -411,40 +518,89 @@
             const schoolListDiv = document.getElementById('school-list-control');
             const darkModeToggle = document.getElementById('darkModeToggle');
             const schoolSearchInput = document.getElementById('schoolSearchInput');
-            const listHeaderContainer = schoolListDiv.querySelector('.list-header-container');
+            const listHeaderContainer = schoolListDiv.querySelector('.list-header-container'); // Grab before clearing
             const checkAllBtn = document.getElementById('checkAllTypesBtn');
             const uncheckAllBtn = document.getElementById('uncheckAllTypesBtn');
 
+            // Clear existing content but keep headers/buttons
             const filterTitle = filterControlDiv.querySelector('h4');
             const filterButtons = filterControlDiv.querySelector('.filter-control-buttons');
-            filterControlDiv.innerHTML = ''; filterControlDiv.appendChild(filterTitle); filterControlDiv.appendChild(filterButtons);
-            filterControlDiv.appendChild(document.createElement('div')).style.clear = 'both';
-            schoolListDiv.innerHTML = listHeaderContainer.outerHTML;
+            filterControlDiv.innerHTML = ''; // Clear
+            filterControlDiv.appendChild(filterTitle); // Re-add
+            filterControlDiv.appendChild(filterButtons); // Re-add
+            filterControlDiv.appendChild(document.createElement('div')).style.clear = 'both'; // Re-add clearfix
+
+            schoolListDiv.innerHTML = listHeaderContainer.outerHTML; // Clear list area, keep header/search
 
             console.log("Populating type filter controls...");
             const fragmentFilters = document.createDocumentFragment();
-            // --- Type Filter Population ---
-            categoryOrder.forEach(categoryName => { /* ... Loop unchanged ... */
-                const isAttendedCategory = categoryName === attendedCategoryName;
-                const typesToProcess = isAttendedCategory ? (schoolsByType[attendedCategoryName] ? [attendedCategoryName] : []) : Object.keys(schoolsByType).filter(type => typeToCategoryMap[type] === categoryName && type !== attendedCategoryName).sort((a, b) => a.localeCompare(b));
-                 if (typesToProcess.length > 0) {
-                      if (!isAttendedCategory && typesToProcess.some(tn => schoolsByType[tn] && schoolsByType[tn].length > 0)) { const categoryHeader = document.createElement('h5'); categoryHeader.className = 'category-header'; categoryHeader.textContent = categoryName; fragmentFilters.appendChild(categoryHeader); }
-                     typesToProcess.forEach(typeName => {
-                         if (!schoolsByType[typeName] || schoolsByType[typeName].length === 0) return;
-                         const filterId = `filter-${typeName.replace(/\W+/g, '-')}`; const itemDiv = document.createElement('div'); itemDiv.className = 'filter-item';
-                         const checkbox = document.createElement('input'); checkbox.type = 'checkbox'; checkbox.id = filterId; checkbox.value = typeName; checkbox.checked = filterState[typeName] !== undefined ? filterState[typeName] : true;
-                         checkbox.addEventListener('change', (event) => { // Type filter listener
-                             const isChecked = event.target.checked;
-                             filterState[typeName] = isChecked;
-                             updateIndividualCheckboxesForType(typeName, isChecked); // Update visibility state of schools
-                             updateMarkersVisibility(); // Update map based on new states
-                         });
-                         const label = document.createElement('label'); label.htmlFor = filterId; const colorBox = document.createElement('span'); colorBox.className = 'filter-color-box' + (isAttendedCategory ? ' person-filter' : ''); colorBox.style.backgroundColor = isAttendedCategory ? personColors["Norman"] : (typeColors[typeName] || '#cccccc');
-                         label.appendChild(colorBox); label.appendChild(document.createTextNode(` ${typeName} (${schoolsByType[typeName].length})`));
-                         itemDiv.appendChild(checkbox); itemDiv.appendChild(label); fragmentFilters.appendChild(itemDiv);
-                     });
+            // --- UPDATED: Type Filter Population with Categories ---
+             categoryOrder.forEach(categoryName => {
+                 const isAttendedCategory = categoryName === attendedCategoryName;
+                 let typesToProcess = [];
+
+                 if (isAttendedCategory) {
+                     // Only process attended if there are schools in it
+                     if (schoolsByType[attendedCategoryName] && schoolsByType[attendedCategoryName].length > 0) {
+                         typesToProcess = [attendedCategoryName];
+                     }
+                 } else {
+                     // Get all types belonging to the current category from the map
+                     typesToProcess = Object.keys(schoolsByType).filter(type => typeToCategoryMap[type] === categoryName && type !== attendedCategoryName);
+                     // Optionally sort types within the category if needed (e.g., alphabetically)
+                     typesToProcess.sort((a, b) => a.localeCompare(b));
                  }
-            });
+
+                 // Only add category header if there are types to process within it
+                 if (typesToProcess.length > 0) {
+                      // Add the main category header (H5) for non-attended categories
+                      if (!isAttendedCategory) {
+                           const categoryHeader = document.createElement('h5');
+                           categoryHeader.className = 'category-header';
+                           categoryHeader.textContent = categoryName;
+                           fragmentFilters.appendChild(categoryHeader);
+                      }
+
+                      // Loop through the specific types (or the single 'attended' category type)
+                      typesToProcess.forEach(typeName => {
+                          // Check again if this specific type has schools (redundant but safe)
+                          if (!schoolsByType[typeName] || schoolsByType[typeName].length === 0) return;
+
+                          const filterId = `filter-${typeName.replace(/\W+/g, '-')}`;
+                          const itemDiv = document.createElement('div');
+                          itemDiv.className = 'filter-item';
+
+                          const checkbox = document.createElement('input');
+                          checkbox.type = 'checkbox';
+                          checkbox.id = filterId;
+                          checkbox.value = typeName;
+                          checkbox.checked = filterState[typeName] !== undefined ? filterState[typeName] : true; // Default checked
+
+                          checkbox.addEventListener('change', (event) => {
+                              const isChecked = event.target.checked;
+                              filterState[typeName] = isChecked;
+                              updateIndividualCheckboxesForType(typeName, isChecked); // Update visibility state of schools
+                              updateMarkersVisibility(); // Update map based on new states
+                              filterSchoolList(); // Apply search filter again as visibility changed
+                          });
+
+                          const label = document.createElement('label');
+                          label.htmlFor = filterId;
+                          const colorBox = document.createElement('span');
+                          // Use person color for attended, type color otherwise
+                          const isPersonType = typeName === attendedCategoryName;
+                          colorBox.className = 'filter-color-box' + (isPersonType ? ' person-filter' : '');
+                          colorBox.style.backgroundColor = isPersonType ? personColors["Norman"] : (typeColors[typeName] || '#cccccc');
+
+                          label.appendChild(colorBox);
+                          label.appendChild(document.createTextNode(` ${typeName} (${schoolsByType[typeName].length})`));
+
+                          itemDiv.appendChild(checkbox);
+                          itemDiv.appendChild(label);
+                          fragmentFilters.appendChild(itemDiv);
+                      });
+                 }
+             });
             filterControlDiv.appendChild(fragmentFilters);
 
 
@@ -459,88 +615,244 @@
 
             console.log("Populating school list with individual checkboxes...");
             const fragmentList = document.createDocumentFragment();
-            // --- School List Population ---
-             categoryOrder.forEach(categoryName => { /* ... Loop structure unchanged ... */
+            // --- UPDATED: School List Population with Hierarchy ---
+             categoryOrder.forEach(categoryName => {
                  const isAttendedCategory = categoryName === attendedCategoryName;
-                 const typesToProcess = isAttendedCategory ? (schoolsByType[attendedCategoryName] ? [attendedCategoryName] : []) : Object.keys(schoolsByType).filter(type => typeToCategoryMap[type] === categoryName && type !== attendedCategoryName).sort((a, b) => a.localeCompare(b));
-                 if (typesToProcess.some(type => schoolsByType[type] && schoolsByType[type].length > 0)) {
-                      const categoryHeading = document.createElement('h5'); categoryHeading.className = 'list-category-header' + (isAttendedCategory ? ' attended-category-header' : ''); categoryHeading.textContent = categoryName; fragmentList.appendChild(categoryHeading);
-                     typesToProcess.forEach(typeName => {
-                          if (schoolsByType[typeName] && schoolsByType[typeName].length > 0) {
-                              if (!isAttendedCategory) { const typeSubHeader = document.createElement('h6'); typeSubHeader.className = 'type-subheader'; typeSubHeader.textContent = typeName; fragmentList.appendChild(typeSubHeader); }
-                              const list = document.createElement('ul');
-                              schoolsByType[typeName].forEach(school => {
-                                 if (isAttendedCategory || school.person !== "Norman") { // Prevent double listing
-                                     const listItem = document.createElement('li'); const markerIndex = school.originalIndex; listItem.setAttribute('data-marker-index', markerIndex); listItem.setAttribute('title', 'Click name: Zoom | Ctrl+Click name: Homepage | Shift+Click checkbox: Group Zoom');
-                                     if (school.person === "Norman") listItem.classList.add('attended-by-person');
-                                     const schoolCheckbox = document.createElement('input'); schoolCheckbox.type = 'checkbox'; schoolCheckbox.checked = school.isVisible; schoolCheckbox.id = `school-checkbox-${markerIndex}`; schoolCheckbox.setAttribute('aria-label', `Toggle visibility for ${school.displayName}`);
-                                     // UPDATED Individual Checkbox Listener
-                                     schoolCheckbox.addEventListener('change', (event) => {
-                                         const isChecked = event.target.checked;
-                                         // Update this school's visibility state
-                                         if(allMarkers[markerIndex] && allMarkers[markerIndex].school) {
-                                             allMarkers[markerIndex].school.isVisible = isChecked;
-                                             updateMarkersVisibility(); // Update map based on this single change
-                                         }
-                                         // Handle Shift+Click for zooming
-                                         if (event.shiftKey) {
-                                              event.preventDefault(); // Prevent potential browser default actions
-                                             console.log(`Shift+Click detected on checkbox for index ${markerIndex}, checked=${isChecked}`); // LOGGING
-                                             if (isChecked) { schoolsSelectedForZoom.add(markerIndex); }
-                                             else { schoolsSelectedForZoom.delete(markerIndex); }
-                                             zoomToSelectedSchools(); // Attempt zoom
-                                         }
-                                     });
-                                     listItem.appendChild(schoolCheckbox);
-                                     const nameSpan = document.createElement('span'); nameSpan.className = 'school-name'; nameSpan.textContent = school.displayName; listItem.appendChild(nameSpan);
-                                     listItem.addEventListener('click', (event) => handleListItemClick(event, markerIndex));
-                                     list.appendChild(listItem);
-                                 }
-                              });
-                               if (list.hasChildNodes()) { fragmentList.appendChild(list); }
+                 let typesInThisCategory = [];
+
+                 // Determine which types/sub-categories belong here
+                 if (isAttendedCategory) {
+                     if (schoolsByType[attendedCategoryName] && schoolsByType[attendedCategoryName].length > 0) {
+                         typesInThisCategory = [attendedCategoryName]; // Special case
+                     }
+                 } else if (categoryName === CATEGORY_PUBLIC) {
+                      typesInThisCategory = publicSubCategoryOrder.filter(type => schoolsByType[type] && schoolsByType[type].length > 0);
+                 } else if (categoryName === CATEGORY_PRIVATE) {
+                      typesInThisCategory = privateSubCategoryOrder.filter(type => schoolsByType[type] && schoolsByType[type].length > 0);
+                 } else if (categoryName === CATEGORY_HIGH_SCHOOLS) {
+                     typesInThisCategory = highSchoolSubCategoryOrder.filter(type => schoolsByType[type] && schoolsByType[type].length > 0);
+                 }
+
+                 // Only add the category if it contains any types with schools
+                 if (typesInThisCategory.length > 0) {
+                     const categoryHeading = document.createElement('h5');
+                     categoryHeading.className = 'list-category-header' + (isAttendedCategory ? ' attended-category-header' : '');
+                     categoryHeading.textContent = categoryName;
+                     fragmentList.appendChild(categoryHeading);
+
+                     // Now loop through the types/sub-categories within this main category
+                     typesInThisCategory.forEach(typeName => {
+                          // Add a sub-header (h6) for specific types, except for the Attended category itself
+                          if (!isAttendedCategory) {
+                               const typeSubHeader = document.createElement('h6');
+                               typeSubHeader.className = 'type-subheader';
+                               typeSubHeader.textContent = typeName; // e.g., "SUNY", "Ivy League", "Other Private"
+                               fragmentList.appendChild(typeSubHeader);
                           }
+
+                          // Create the list (ul) for this type/sub-category
+                          const list = document.createElement('ul');
+                          schoolsByType[typeName].forEach(school => {
+                              // Prevent double listing Norman's schools if they are also listed under their type
+                              if (isAttendedCategory || school.person !== "Norman" || !schoolsByType[attendedCategoryName].some(attSch => attSch.originalIndex === school.originalIndex)) {
+                                  const listItem = document.createElement('li');
+                                  const markerIndex = school.originalIndex;
+                                  listItem.setAttribute('data-marker-index', markerIndex);
+                                  listItem.setAttribute('title', 'Click name: Zoom | Ctrl+Click name: Homepage | Shift+Click checkbox: Group Zoom');
+
+                                  // Highlight if attended by Norman, regardless of the category it's listed under
+                                  if (school.person === "Norman") {
+                                      listItem.classList.add('attended-by-person');
+                                  }
+
+                                  const schoolCheckbox = document.createElement('input');
+                                  schoolCheckbox.type = 'checkbox';
+                                  schoolCheckbox.checked = school.isVisible; // Reflect initial state
+                                  schoolCheckbox.id = `school-checkbox-${markerIndex}`;
+                                  schoolCheckbox.setAttribute('aria-label', `Toggle visibility for ${school.displayName}`);
+
+                                  // Individual Checkbox Listener
+                                  schoolCheckbox.addEventListener('change', (event) => {
+                                      const isChecked = event.target.checked;
+                                      // Update this specific school's visibility state
+                                      if (allMarkers[markerIndex] && allMarkers[markerIndex].school) {
+                                          allMarkers[markerIndex].school.isVisible = isChecked;
+                                          updateMarkersVisibility(); // Update map based on this single change
+                                          filterSchoolList(); // Apply search filter again as visibility changed
+                                      } else {
+                                           console.warn(`Could not find school data for index ${markerIndex} on checkbox change.`);
+                                      }
+
+                                      // Handle Shift+Click for zooming
+                                      if (event.shiftKey) {
+                                          event.preventDefault(); // Prevent potential browser default actions
+                                          console.log(`Shift+Click detected on checkbox for index ${markerIndex}, checked=${isChecked}`);
+                                          if (isChecked && allMarkers[markerIndex] && allMarkers[markerIndex].school.isVisible) { // Only add if visible
+                                               schoolsSelectedForZoom.add(markerIndex);
+                                           } else {
+                                               schoolsSelectedForZoom.delete(markerIndex);
+                                           }
+                                          zoomToSelectedSchools(); // Attempt zoom
+                                      } else {
+                                          // If not shift-clicking, ensure it's removed from zoom selection if unchecked
+                                          if (!isChecked) {
+                                              schoolsSelectedForZoom.delete(markerIndex);
+                                          }
+                                      }
+
+                                      // Update the corresponding TYPE filter checkbox state if needed (e.g., if all individuals are unchecked)
+                                      const typeFilterCheckbox = document.getElementById(`filter-${school.type.replace(/\W+/g, '-')}`);
+                                      if (typeFilterCheckbox) {
+                                           const allOfType = schoolsByType[school.type];
+                                           const allChecked = allOfType.every(s => s.isVisible);
+                                           const noneChecked = allOfType.every(s => !s.isVisible);
+                                           if (allChecked) {
+                                                typeFilterCheckbox.checked = true;
+                                                typeFilterCheckbox.indeterminate = false;
+                                           } else if (noneChecked) {
+                                                typeFilterCheckbox.checked = false;
+                                                typeFilterCheckbox.indeterminate = false;
+                                           } else {
+                                                typeFilterCheckbox.indeterminate = true; // Some checked, some not
+                                           }
+                                      }
+                                        // Update the ATTENDED filter checkbox state if needed
+                                        if (school.person === "Norman") {
+                                            const attendedFilterCheckbox = document.getElementById(`filter-${attendedCategoryName.replace(/\W+/g, '-')}`);
+                                            if (attendedFilterCheckbox) {
+                                                const allAttended = schoolsByType[attendedCategoryName];
+                                                const allAttendedChecked = allAttended.every(s => s.isVisible);
+                                                const noneAttendedChecked = allAttended.every(s => !s.isVisible);
+                                                if (allAttendedChecked) {
+                                                    attendedFilterCheckbox.checked = true;
+                                                    attendedFilterCheckbox.indeterminate = false;
+                                                } else if (noneAttendedChecked) {
+                                                    attendedFilterCheckbox.checked = false;
+                                                    attendedFilterCheckbox.indeterminate = false;
+                                                } else {
+                                                    attendedFilterCheckbox.indeterminate = true;
+                                                }
+                                            }
+                                        }
+
+
+                                  });
+
+                                  listItem.appendChild(schoolCheckbox);
+                                  const nameSpan = document.createElement('span');
+                                  nameSpan.className = 'school-name';
+                                  nameSpan.textContent = school.displayName;
+                                  listItem.appendChild(nameSpan);
+                                  listItem.addEventListener('click', (event) => handleListItemClick(event, markerIndex));
+                                  list.appendChild(listItem);
+                              }
+                          });
+                          // Only append the list if it actually contains items for this type
+                           if (list.hasChildNodes()) {
+                               fragmentList.appendChild(list);
+                           }
                      });
                  }
-            });
+             });
             schoolListDiv.appendChild(fragmentList);
 
 
             console.log("Creating markers...");
             allMarkers = new Array(allData.length);
-            // --- Marker Creation (No change needed here) ---
+            // --- Marker Creation (Handles new types via typeColors map) ---
              allData.forEach((itemData, index) => {
-                let processedSchool = null; for (const type in schoolsByType) { processedSchool = schoolsByType[type].find(s => s.originalIndex === index); if (processedSchool) break; }
-                 if (!processedSchool) { console.error("Could not find processed school data for index:", index); processedSchool = { ...itemData, isVisible: true, type: itemData.type || "Unknown", originalIndex: index }; }
-                 const type = processedSchool.type; const markerColor = typeColors[type] || '#cccccc'; const personColor = processedSchool.person && personColors[processedSchool.person] ? personColors[processedSchool.person] : null; const displayColor = personColor || markerColor;
-                 const markerIcon = { path: google.maps.SymbolPath.CIRCLE, fillColor: displayColor, fillOpacity: 0.9, strokeColor: isDarkMode ? '#111111' : '#ffffff', strokeWeight: 1.0, scale: 7 };
-                 const marker = new google.maps.Marker({ position: { lat: processedSchool.lat, lng: processedSchool.lng }, map: map, title: processedSchool.name, icon: markerIcon, visible: processedSchool.isVisible });
+                 // Find the processed school data which includes the originalIndex
+                 let processedSchool = null;
+                 for (const type in schoolsByType) {
+                     // Check current type list and the 'attended' list
+                     const found = schoolsByType[type].find(s => s.originalIndex === index);
+                     if (found) {
+                         processedSchool = found;
+                         break;
+                     }
+                 }
+
+                 if (!processedSchool) {
+                     console.error("Could not find processed school data for index:", index, "Item:", itemData);
+                     // Fallback: create a basic processedSchool object, might lack some properties
+                     processedSchool = {
+                         ...itemData,
+                         isVisible: filterState[itemData.type] !== undefined ? filterState[itemData.type] : true, // Get initial visibility from filterState
+                         type: itemData.type || "Unknown",
+                         displayName: itemData.name,
+                         originalIndex: index
+                     };
+                      // Ensure it's added to schoolsByType if completely missed by processSchoolData (shouldn't happen)
+                      if (processedSchool.type !== "Unknown" && !schoolsByType[processedSchool.type]) schoolsByType[processedSchool.type] = [];
+                      if (processedSchool.type !== "Unknown" && !schoolsByType[processedSchool.type].some(s => s.originalIndex === index)) {
+                           schoolsByType[processedSchool.type].push(processedSchool);
+                      }
+                 }
+
+                 const type = processedSchool.type;
+                 const markerColor = typeColors[type] || '#cccccc'; // Use defined color or default
+                 const personColor = processedSchool.person && personColors[processedSchool.person] ? personColors[processedSchool.person] : null;
+                 const displayColor = personColor || markerColor; // Prioritize person color
+
+                 const markerIcon = {
+                     path: google.maps.SymbolPath.CIRCLE,
+                     fillColor: displayColor,
+                     fillOpacity: 0.9,
+                     strokeColor: isDarkMode ? '#111111' : '#ffffff', // Adjust stroke for dark/light mode
+                     strokeWeight: 1.0,
+                     scale: 7
+                 };
+
+                 const marker = new google.maps.Marker({
+                     position: { lat: processedSchool.lat, lng: processedSchool.lng },
+                     map: map,
+                     title: processedSchool.name,
+                     icon: markerIcon,
+                     visible: processedSchool.isVisible // Set initial visibility based on processed data
+                 });
+
+                 // Store marker and associated processed school data
                  allMarkers[index] = { marker: marker, type: type, school: processedSchool };
-                 marker.addListener("click", () => { const schoolData = allMarkers[index].school; let contentString = `<div class="info-window-content">`; const targetUrl = schoolData.homepageUrl || '#'; const openInNewTab = schoolData.homepageUrl ? 'target="_blank"' : ''; if (schoolData.imageUrl && schoolData.imageUrl !== 'x') contentString += `<a href="${targetUrl}" ${openInNewTab}><img src="${schoolData.imageUrl}" alt="${schoolData.name} logo/photo"></a>`; if (schoolData.homepageUrl) contentString += `<a href="${targetUrl}" ${openInNewTab}><b>${schoolData.name}</b></a>`; else contentString += `<b>${schoolData.name}</b>`; contentString += `<br><span class="info-window-type">Type: ${schoolData.type}</span>`; if(schoolData.person) contentString += `<br><span class="info-window-person">Attended by: ${schoolData.person}</span>`; contentString += `</div>`; infowindow.setContent(contentString); infowindow.open(map, marker); });
-            });
+
+                 // Add click listener for info window
+                 marker.addListener("click", () => {
+                     const schoolData = allMarkers[index].school; // Use the stored processed school data
+                     let contentString = `<div class="info-window-content">`;
+                     const targetUrl = schoolData.homepageUrl || '#';
+                     const openInNewTab = schoolData.homepageUrl ? 'target="_blank"' : '';
+                     if (schoolData.imageUrl && schoolData.imageUrl !== 'x') contentString += `<a href="${targetUrl}" ${openInNewTab}><img src="${schoolData.imageUrl}" alt="${schoolData.name} logo/photo"></a>`;
+                     if (schoolData.homepageUrl) contentString += `<a href="${targetUrl}" ${openInNewTab}><b>${schoolData.displayName}</b></a>`; else contentString += `<b>${schoolData.displayName}</b>`; // Use displayName
+                     contentString += `<br><span class="info-window-type">Type: ${schoolData.type}</span>`;
+                     if (schoolData.person) contentString += `<br><span class="info-window-person">Attended by: ${schoolData.person}</span>`;
+                     contentString += `</div>`;
+                     infowindow.setContent(contentString);
+                     infowindow.open(map, marker);
+                 });
+             });
              console.log(`${allMarkers.filter(m => m).length} Markers created and stored.`);
 
             // --- Event Listeners ---
             darkModeToggle.addEventListener('click', () => { /* ... Dark mode unchanged ... */
                  isDarkMode = !isDarkMode; document.body.classList.toggle('dark-mode', isDarkMode); map.setOptions({ styles: isDarkMode ? darkModeStyle : null });
-                 allMarkers.forEach(mInfo => { if (mInfo && mInfo.marker) { const icon = mInfo.marker.getIcon(); icon.strokeColor = isDarkMode ? '#111111' : '#ffffff'; mInfo.marker.setIcon(icon); } });
+                 allMarkers.forEach(mInfo => { if (mInfo && mInfo.marker) { const icon = mInfo.marker.getIcon(); if(icon && typeof icon === 'object') { icon.strokeColor = isDarkMode ? '#111111' : '#ffffff'; mInfo.marker.setIcon(icon); } } });
                  darkModeToggle.textContent = isDarkMode ? '☀️ Switch to Light Mode' : '🌙 Switch to Dark Mode'; darkModeToggle.title = isDarkMode ? 'Switch to Light Mode' : 'Switch to Dark Mode';
             });
             schoolSearchInput.addEventListener('input', filterSchoolList);
             checkAllBtn.addEventListener('click', () => { /* ... Check all unchanged ... */
                  console.log("Checking all type filters..."); const typeCheckboxes = filterControlDiv.querySelectorAll('.filter-item input[type="checkbox"]');
-                 typeCheckboxes.forEach(cb => { cb.checked = true; const typeName = cb.value; filterState[typeName] = true; updateIndividualCheckboxesForType(typeName, true); });
-                 updateMarkersVisibility();
+                 typeCheckboxes.forEach(cb => { cb.checked = true; cb.indeterminate = false; const typeName = cb.value; filterState[typeName] = true; updateIndividualCheckboxesForType(typeName, true); });
+                 updateMarkersVisibility(); filterSchoolList(); // Apply filter
              });
              uncheckAllBtn.addEventListener('click', () => { /* ... Uncheck all unchanged ... */
                  console.log("Unchecking all type filters..."); const typeCheckboxes = filterControlDiv.querySelectorAll('.filter-item input[type="checkbox"]');
-                 typeCheckboxes.forEach(cb => { cb.checked = false; const typeName = cb.value; filterState[typeName] = false; updateIndividualCheckboxesForType(typeName, false); });
-                 updateMarkersVisibility();
+                 typeCheckboxes.forEach(cb => { cb.checked = false; cb.indeterminate = false; const typeName = cb.value; filterState[typeName] = false; updateIndividualCheckboxesForType(typeName, false); });
+                 updateMarkersVisibility(); filterSchoolList(); // Apply filter
              });
 
             // --- Initial State ---
-            Object.keys(filterState).forEach(typeName => { updateIndividualCheckboxesForType(typeName, filterState[typeName]); });
-            updateMarkersVisibility();
-            filterSchoolList();
+            // Set initial visibility based on filterState (already done during marker creation using processedSchool.isVisible)
+            // updateMarkersVisibility(); // Call once after markers are created
+            filterSchoolList(); // Apply initial search filter (if any) and hide empty categories/subheaders
 
             console.log("Map initialization complete.");
         }
