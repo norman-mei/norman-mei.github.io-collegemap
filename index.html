@@ -3,9 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Northeast Schools Map</title>
+    <title>Northeast Schools & More Map</title>
     <style>
-        /* --- All CSS styles from the previous version remain the same --- */
+
         html, body { height: 100%; margin: 0; padding: 0; font-family: sans-serif; background-color: #f8f9fa; color: #212529; transition: background-color 0.3s, color 0.3s; overflow: hidden; }
         #map-container { height: 100%; width: 100%; }
         #controls-and-list-container { float: left; width: 30%; height: 100%; overflow-y: auto; background-color: #f8f9fa; border-right: 1px solid #ccc; padding: 10px; box-sizing: border-box; transition: background-color 0.3s, border-color 0.3s; }
@@ -17,7 +17,7 @@
         .info-window-content a { color: inherit; text-decoration: none; }
         .info-window-content a:hover { text-decoration: underline; cursor: pointer; }
         .info-window-type { color: #555; font-style: italic; }
-        .info-window-person { color: #FF5733; font-weight: bold; }
+        .info-window-person { /* color removed, will be set inline */; font-weight: bold; }
         .map-control { background-color: rgba(255, 255, 255, 0.9); padding: 10px 15px; margin-bottom: 10px; border: 1px solid #bbb; border-radius: 4px; box-shadow: 0 1px 4px rgba(0, 0, 0, 0.2); color: #222; box-sizing: border-box; transition: background-color 0.3s, color 0.3s, border-color 0.3s; }
         .map-control h4 { margin-top: 0; margin-bottom: 8px; padding-bottom: 4px; border-bottom: 1px solid #eee; font-size: 1.1em; font-weight: bold; transition: border-color 0.3s; display: inline-block; margin-right: 10px; }
         .map-control h5 { margin-top: 10px; margin-bottom: 5px; font-size: 1em; font-weight: bold; display: block; padding-bottom: 3px; border-bottom: 1px dashed #ddd; transition: border-color 0.3s; }
@@ -35,7 +35,7 @@
         .filter-item label { margin-left: 5px; vertical-align: middle; cursor: pointer; }
         .filter-item input[type="checkbox"] { vertical-align: middle; cursor: pointer; }
         .filter-color-box { width: 12px; height: 12px; border: 1px solid #ccc; margin-right: 5px; display: inline-block; vertical-align: middle; transition: border-color 0.3s; }
-        .filter-color-box.person-filter { border: 2px solid #555; }
+        .filter-color-box.person-filter { border: 2px solid #555; background-color: #eee; /* Generic indicator */ }
         #school-list-control { font-size: 0.9em; }
         .list-header-container { overflow: hidden; margin-bottom: 8px; padding-bottom: 4px; border-bottom: 1px solid #eee; transition: border-color 0.3s; }
         .list-header-container h4 { float: left; margin-bottom: 0; border-bottom: none; padding-bottom: 0; line-height: 26px; }
@@ -43,18 +43,18 @@
         #school-list-control ul { list-style: none; padding: 0; margin: 0 0 10px 0; }
         #school-list-control li { padding: 3px 0; word-wrap: break-word; cursor: pointer; display: flex; align-items: center; }
         #school-list-control li input[type="checkbox"] { margin-right: 6px; flex-shrink: 0; cursor: pointer; vertical-align: middle; }
-        #school-list-control li span.school-name { flex-grow: 1; vertical-align: middle; line-height: 1.4; }
-        #school-list-control li.attended-by-person span.school-name { color: #FF5733; }
+        #school-list-control li span.school-name { flex-grow: 1; vertical-align: middle; line-height: 1.4; /* Color will be set inline */ }
+        #school-list-control li.attended-by-person span.school-name { font-weight: bold; /* Make attended names bold */ }
         #school-list-control a { color: #007bff; text-decoration: none; }
         #school-list-control a:hover { text-decoration: underline; }
         #school-list-control h6.type-subheader { margin-top: 8px; margin-bottom: 3px; font-size: 0.95em; font-weight: normal; font-style: italic; color: #444; padding-left: 5px; display: block; }
-        #school-list-control h5.list-category-header { /* Existing */ }
-        #school-list-control h5.attended-category-header { color: #FF5733; }
+        #school-list-control h5.list-category-header { /* Generic category header */ }
+        #school-list-control h5.attended-category-header { font-style: italic; /* Distinguish attended category header */ }
         .filter-control-buttons { display: inline-block; vertical-align: middle; margin-bottom: 8px; }
         .filter-control-buttons button { font-size: 0.8em; padding: 2px 6px; margin-left: 5px; cursor: pointer; border: 1px solid #bbb; border-radius: 3px; background-color: #f0f0f0; transition: background-color 0.2s; }
         .filter-control-buttons button:hover { background-color: #e0e0e0; }
 
-        /* --- Dark Mode Styles --- */
+        /* Dark Mode Specific Styles */
         body.dark-mode { background-color: #121212; color: #e0e0e0; }
         body.dark-mode #controls-and-list-container { background-color: #1a1a1a; border-right-color: #444; }
         body.dark-mode .map-control { background-color: rgba(40, 40, 40, 0.9); color: #e0e0e0; border-color: #555; }
@@ -64,7 +64,7 @@
         body.dark-mode .list-header-container { border-bottom-color: #444; }
         body.dark-mode #schoolSearchInput { background-color: #333; border-color: #555; color: #e0e0e0; }
         body.dark-mode .filter-color-box { border-color: #666; }
-        body.dark-mode .filter-color-box.person-filter { border-color: #aaa; }
+        body.dark-mode .filter-color-box.person-filter { border-color: #aaa; background-color: #444; }
         body.dark-mode .dark-mode-toggle-control { background-color: rgba(50, 50, 50, 0.9); color: #e0e0e0; border-color: #555; }
         body.dark-mode .dark-mode-toggle-control:hover { background-color: rgba(70, 70, 70, 0.95); }
         body.dark-mode .gm-style-iw-c { background-color: #282828 !important; box-shadow: 0 2px 7px 1px rgba(255, 255, 255, 0.2); }
@@ -74,7 +74,7 @@
         body.dark-mode .info-window-content a { color: #90caf9 !important; }
         body.dark-mode .info-window-content a:hover { color: #bbdefb !important; }
         body.dark-mode .info-window-type { color: #aaa; }
-        body.dark-mode .info-window-person { color: #FFA07A; }
+        body.dark-mode .info-window-person { /* color removed, set inline */; }
         body.dark-mode .gm-style .gm-style-iw-c button[title="Close"] , body.dark-mode .gm-style .gm-style-iw-c button[aria-label="Close"] { background: none !important; border: none !important; box-shadow: none !important; opacity: 1 !important; border-radius: 2px !important; padding: 4px !important; right: 6px !important; top: 6px !important; cursor: pointer; transition: background-color 0.2s ease; }
         body.dark-mode .gm-style .gm-style-iw-c button[title="Close"]:hover, body.dark-mode .gm-style .gm-style-iw-c button[aria-label="Close"]:hover { background-color: rgba(255, 255, 255, 0.2) !important; }
         body.dark-mode .gm-style .gm-style-iw-c button[title="Close"] img, body.dark-mode .gm-style .gm-style-iw-c button[aria-label="Close"] img { display: block !important; width: 14px !important; height: 14px !important; filter: contrast(0) sepia(1) hue-rotate(0deg) saturate(0) brightness(1.5) invert(1) !important; opacity: 1 !important; transform: scale(1) !important; }
@@ -92,8 +92,8 @@
         body.dark-mode .gm-style .gm-style-cc a:link, body.dark-mode .gm-style .gm-style-cc a:visited { color: #ffffff !important; text-decoration: none !important; opacity: 0.9 !important; }
         body.dark-mode .gm-style .gm-style-cc a:hover { color: #ffffff !important; text-decoration: underline !important; opacity: 1 !important; }
         body.dark-mode #school-list-control li:hover span.school-name { text-decoration: underline; }
-        body.dark-mode #school-list-control li.attended-by-person span.school-name { color: #FFA07A; }
-        body.dark-mode #school-list-control h5.attended-category-header { color: #FFA07A; }
+        /* Dark mode attended colors set inline */
+        body.dark-mode #school-list-control h5.attended-category-header { /* Style updated */ font-style: italic; color: #ddd; }
         body.dark-mode #school-list-control h6.type-subheader { color: #bbb; }
         body.dark-mode .tip-message { background-color: #2a3a50; border-color: #4a6a90; color: #bcd8f0; }
         body.dark-mode .dismiss-button { color: #888; }
@@ -106,7 +106,7 @@
     <div id="map-container">
         <div id="controls-and-list-container">
             <div id="description-control" class="map-control">
-                 <span>Northeast Schools Map</span>
+                 <span>Northeast Schools & More Map</span>
                  <button id="darkModeToggle" class="dark-mode-toggle-control" title="Switch to Dark Mode">🌙 Switch to Dark Mode</button>
             </div>
             <div id="filter-control" class="map-control">
@@ -116,49 +116,61 @@
                      <button id="uncheckAllTypesBtn" title="Uncheck all school type filters">Uncheck All</button>
                  </div>
                  <div style="clear: both;"></div>
-                 <!-- Filters added here by JS -->
+                 {/* Filter checkboxes will be added here by JS */}
             </div>
             <div id="school-list-control" class="map-control">
                 <div class="list-header-container">
                     <h4>School List & Visibility</h4>
                     <input type="text" id="schoolSearchInput" placeholder="Search schools...">
                 </div>
-                 <!-- Tip/List added here by JS -->
+                 {/* School list items will be added here by JS */}
             </div>
         </div>
         <div id="map"></div>
     </div>
 
     <script>
-        // --- Data ---
-        const personColors = { "Norman": "#FF5733" };
-        // NEW: Added type for "Other Private" and assigned a color
+
+        // --- Person Colors ---
+        const personColors = {
+            "Norman": "#007FFF", // Red-Orange
+            "Matthew": "#33B5E5", // Light Blue
+            "Jason": "#AA66CC", // Purple
+            "David": "#FFBB33",  // Orange (Swapped from Lime Green)
+            "Ashton": "#00FF00" // Lime Green (Swapped from Orange)
+        };
+        const peopleNames = Object.keys(personColors); // Get a list of people
+
+        // --- Type Definitions and Colors ---
         const TYPE_OTHER_PRIVATE = "Other Private";
         const typeColors = {
             "SUNY": "#00DDFF",
             "CUNY": "#0033A1",
             "Ivy League": "#006934",
-            [TYPE_OTHER_PRIVATE]: "#8B4513", // SaddleBrown color for Other Private
+            [TYPE_OTHER_PRIVATE]: "#8B4513", // Brown
             "Specialized HS": "#FF9A30",
-            "NEST+m": "#68428A"
+            "NEST+m": "#68428A",
+            "Purdue University System": "#ddb945" // Added for Purdue (example color)
         };
-        const attendedCategoryName = "Attended by Norman";
+        const attendedCategoryName = "Attended Schools"; // Renamed category
+
+        // --- Dark Mode Style ---
         const darkModeStyle = [ { elementType: "geometry", stylers: [{ color: "#242f3e" }] }, { elementType: "labels.text.stroke", stylers: [{ color: "#242f3e" }] }, { elementType: "labels.text.fill", stylers: [{ color: "#746855" }] }, { featureType: "administrative.locality", elementType: "labels.text.fill", stylers: [{ color: "#d59563" }], }, { featureType: "poi", elementType: "labels.text.fill", stylers: [{ color: "#d59563" }], }, { featureType: "poi.park", elementType: "geometry", stylers: [{ color: "#263c3f" }], }, { featureType: "poi.park", elementType: "labels.text.fill", stylers: [{ color: "#6b9a76" }], }, { featureType: "road", elementType: "geometry", stylers: [{ color: "#38414e" }], }, { featureType: "road", elementType: "geometry.stroke", stylers: [{ color: "#212a37" }], }, { featureType: "road", elementType: "labels.text.fill", stylers: [{ color: "#9ca5b3" }], }, { featureType: "road.highway", elementType: "geometry", stylers: [{ color: "#746855" }], }, { featureType: "road.highway", elementType: "geometry.stroke", stylers: [{ color: "#1f2835" }], }, { featureType: "road.highway", elementType: "labels.text.fill", stylers: [{ color: "#f3d19c" }], }, { featureType: "transit", elementType: "geometry", stylers: [{ color: "#2f3948" }], }, { featureType: "transit.station", elementType: "labels.text.fill", stylers: [{ color: "#d59563" }], }, { featureType: "water", elementType: "geometry", stylers: [{ color: "#17263c" }], }, { featureType: "water", elementType: "labels.text.fill", stylers: [{ color: "#515c6d" }], }, { featureType: "water", elementType: "labels.text.stroke", stylers: [{ color: "#17263c" }], }, ];
 
-        // --- Existing Data Arrays (SUNY, CUNY, Ivy League, SHS, NEST+m) ---
-        const sunyCampuses = [ /* ... SUNNY data remains the same ... */
+        // --- School Data Arrays ---
+        const sunyCampuses = [
             { lat: 42.0894, lng: -75.9695, name: "SUNY Binghamton University", person: "Norman", type: "SUNY", imageUrl: "https://pbs.twimg.com/profile_images/601475591918002177/qeftl81n_400x400.png", homepageUrl: "https://www.binghamton.edu/" },
             { lat: 43.3531, lng: -73.6541, name: "SUNY Adirondack CC ", type: "SUNY", homepageUrl: "https://www.sunyacc.edu/", imageUrl: "https://getlogovector.com/wp-content/uploads/2020/01/suny-adirondack-logo-vector.png" },
             { lat: 42.6842, lng: -73.8261, name: "SUNY Albany", type: "SUNY", homepageUrl: "https://www.albany.edu/", imageUrl: "https://www.albany.edu/sites/default/files/UAlbanyMark_F_S01A_HEX_Gold_Black_300ppi_.jpg" },
-            { lat: 42.2552, lng: -77.7947, name: "SUNY Alfred State College", type: "SUNY", homepageUrl: "https://www.alfredstate.edu/", imageUrl: "https://upload.wikimedia.org/wikipedia/commons/e/e6/Alfred_State_Primary_Logo.png" },
-            { lat: 42.1348, lng: -75.9086, name: "SUNY Broome CC ", type: "SUNY", homepageUrl: "https://www.sunybroome.edu/", imageUrl: "https://broomehornets.com/assets/Primary_Logo_-_.5x.png" },
+            { lat: 42.2552, lng: -77.7947, name: "SUNY Alfred State College (ASC)", type: "SUNY", homepageUrl: "https://www.alfredstate.edu/", imageUrl: "https://upload.wikimedia.org/wikipedia/commons/e/e6/Alfred_State_Primary_Logo.png" },
+            { lat: 42.1348, lng: -75.9086, name: "SUNY Broome CC (BCC) ", type: "SUNY", homepageUrl: "https://www.sunybroome.edu/", imageUrl: "https://broomehornets.com/assets/Primary_Logo_-_.5x.png" },
             { lat: 43.2105, lng: -77.9508, name: "SUNY Brockport", type: "SUNY", homepageUrl: "https://www.brockport.edu/", imageUrl: "https://www.brockport.edu/live/files/7350-bptlogoallinonecolorjpeg" },
             { lat: 42.9321, lng: -78.8836, name: "SUNY Buffalo State", type: "SUNY", homepageUrl: "https://suny.buffalostate.edu/", imageUrl: "https://upload.wikimedia.org/wikipedia/en/6/68/Buffalo_suny_seal.png" },
             { lat: 44.603333, lng: -75.183333, name: "SUNY Canton", type: "SUNY", homepageUrl: "https://www.canton.edu/", imageUrl: "https://upload.wikimedia.org/wikipedia/commons/thumb/9/9d/SUNY_Canton_logo.svg/2560px-SUNY_Canton_logo.svg.png" },
             { lat: 42.945079, lng: -76.542783, name: "SUNY Cayuga CC ", type: "SUNY", homepageUrl: "https://www.cayuga-cc.edu/", imageUrl: "https://www.suny.edu/media/suny/content-assets/images/campus-profiles/logos/cayuga.jpg" },
-            { lat: 44.6483, lng: -73.4399, name: "SUNY Clinton CC ", type: "SUNY", homepageUrl: "https://www.clinton.edu/", imageUrl: "https://www.suny.edu/media/suny/content-assets/images/campus-profiles/logos/clinton.jpg" },
+            { lat: 44.6483, lng: -73.4399, name: "SUNY Clinton CC (CCC) ", type: "SUNY", homepageUrl: "https://www.clinton.edu/", imageUrl: "https://www.suny.edu/media/suny/content-assets/images/campus-profiles/logos/clinton.jpg" },
             { lat: 42.673, lng: -74.4984, name: "SUNY Cobleskill", type: "SUNY", homepageUrl: "https://www.cobleskill.edu/", imageUrl: "https://adpi.org/wp-content/uploads/2024/05/SUNY-Cobleskill.png" },
-            { lat: 42.2175, lng: -73.818, name: "SUNY Columbia-Greene CC", type: "SUNY", homepageUrl: "https://www.sunycgcc.edu/", imageUrl: "https://www.suny.edu/media/suny/content-assets/images/campus-profiles/logos/columbia-greene.jpg" },
+            { lat: 42.2175, lng: -73.818, name: "SUNY Columbia-Greene CC (C-GCC)", type: "SUNY", homepageUrl: "https://www.sunycgcc.edu/", imageUrl: "https://www.suny.edu/media/suny/content-assets/images/campus-profiles/logos/columbia-greene.jpg" },
             { lat: 42.1173, lng: -77.0735, name: "SUNY Corning CC", type: "SUNY", homepageUrl: "https://www.corning-cc.edu/", imageUrl: "https://upload.wikimedia.org/wikipedia/commons/e/ea/Suny-corning-logo-header.png" },
             { lat: 42.4482, lng: -76.4794, name: "SUNY Cornell College of Agriculture and Life Sciences (CALS)", type: "SUNY", homepageUrl: "https://cals.cornell.edu/", imageUrl: "https://cals.cornell.edu/sites/default/files/styles/image_callout_wide/public/2019-08/wordmark-primary-2.png?h=c448c513&itok=fr8oNTwl" },
             { lat: 42.4475, lng: -76.4649, name: "SUNY Cornell College of Veterinary Medicine (CVM)", type: "SUNY", homepageUrl: "https://www.vet.cornell.edu/", imageUrl: "https://cdn.prod.website-files.com/62c8f3d1903d341ce3fe3362/631e1a003bcb9cddf02c2b9e_2C%20on%20W.svg" },
@@ -167,7 +179,7 @@
             { lat: 42.5990, lng: -76.1878, name: "SUNY Cortland", type: "SUNY", homepageUrl: "https://www2.cortland.edu/", imageUrl: "https://www2.cortland.edu/offices/publications/big/images/sc-primary.png" },
             { lat: 42.2706, lng: -74.9247, name: "SUNY Delhi", type: "SUNY", homepageUrl: "https://www.delhi.edu/", imageUrl: "https://www.delhi.edu/about/college-relations/style-guide/logo_files_2022/rgb/suny_delhi_logo_rgb_2022.png" },
             { lat: 40.6554, lng: -73.9457, name: "SUNY Downstate Medical Center", type: "SUNY", homepageUrl: "https://www.downstate.edu/", imageUrl: "https://www.downstate.edu/news-events/communications-marketing/new-media-services/_images/_logos/png/primary_logo.png" },
-            { lat: 41.7249, lng: -73.9043, name: "SUNY Dutchess CC", type: "SUNY", homepageUrl: "https://www.sunydutchess.edu/", imageUrl: "https://www.suny.edu/media/suny/content-assets/images/campus-profiles/logos/dutchess.jpg" },
+            { lat: 41.7249, lng: -73.9043, name: "SUNY Dutchess CC (DCC)", type: "SUNY", homepageUrl: "https://www.sunydutchess.edu/", imageUrl: "https://www.suny.edu/media/suny/content-assets/images/campus-profiles/logos/dutchess.jpg" },
             { lat: 43.0348, lng: -76.1355, name: "SUNY Environmental Science and Forestry (ESF)", type: "SUNY", homepageUrl: "https://www.esf.edu/", imageUrl: "https://upload.wikimedia.org/wikipedia/en/9/9b/Sunyesfcrest.png" },
             { lat: 43.0779, lng: -73.8058, name: "SUNY Empire (Saratoga Springs)", type: "SUNY", homepageUrl: "https://www.sunyempire.edu/", imageUrl: "https://sunyempire.edu/media/enrollment-management/marketing/new-logos/T4Mockups-Logo-Stacked-Color-1.png" },
             { lat: 42.13579876281415,  lng: -75.90924658656265, name: "SUNY Empire (Binghamton)", type: "SUNY", homepageUrl: "https://www.sunyempire.edu/", imageUrl: "https://sunyempire.edu/media/enrollment-management/marketing/new-logos/T4Mockups-Logo-Stacked-Color-1.png" },
@@ -182,59 +194,61 @@
             { lat: 40.61005850951833,  lng: -74.17919048476328, name: "SUNY Empire (Staten Island)", type: "SUNY", homepageUrl: "https://www.sunyempire.edu/", imageUrl: "https://sunyempire.edu/media/enrollment-management/marketing/new-logos/T4Mockups-Logo-Stacked-Color-1.png" },
             { lat: 43.01012946851664,  lng: -76.19005547755863, name: "SUNY Empire (Syracuse)", type: "SUNY", homepageUrl: "https://www.sunyempire.edu/", imageUrl: "https://sunyempire.edu/media/enrollment-management/marketing/new-logos/T4Mockups-Logo-Stacked-Color-1.png" },
             { lat: 40.92809538640441,  lng: -73.85091183635622, name: "SUNY Empire (Yonkers)", type: "SUNY", homepageUrl: "https://www.sunyempire.edu/", imageUrl: "https://sunyempire.edu/media/enrollment-management/marketing/new-logos/T4Mockups-Logo-Stacked-Color-1.png" },
-            { lat: 42.9593, lng: -78.7215, name: "SUNY Erie CC", type: "SUNY", homepageUrl: "https://www.ecc.edu/", imageUrl: "https://www.ecc.edu/_resources/assets/img/logo-red.svg" },
+            { lat: 42.9593, lng: -78.7215, name: "SUNY Erie CC (ECC)", type: "SUNY", homepageUrl: "https://www.ecc.edu/", imageUrl: "https://www.ecc.edu/_resources/assets/img/logo-red.svg" },
             { lat: 40.7529, lng: -73.4267, name: "SUNY Farmingdale State College", type: "SUNY", homepageUrl: "https://www.farmingdale.edu/", imageUrl: "https://upload.wikimedia.org/wikipedia/en/thumb/e/eb/SUNY_Farmingdale_seal.svg/1200px-SUNY_Farmingdale_seal.svg.png" },
-            { lat: 40.7467, lng: -73.9942, name: "SUNY Fashion Institue of Technology ", type: "SUNY", homepageUrl: "https://www.fitnyc.edu/", imageUrl: "https://www.fitnyc.edu/images/cer/fit-master-brand-wordmark-2-line.jpg" },
-            { lat: 42.86811292987424, lng: -77.24190498609116, name: "SUNY Finger Lakes CC", type: "SUNY", homepageUrl: "https://www.flcc.edu/", imageUrl: "https://www.suny.edu/media/suny/content-assets/images/campus-profiles/logos/fingerlakes.jpg" },
+            { lat: 40.7467, lng: -73.9942, name: "SUNY Fashion Institue of Technology (FIT)", type: "SUNY", homepageUrl: "https://www.fitnyc.edu/", imageUrl: "https://www.fitnyc.edu/images/cer/fit-master-brand-wordmark-2-line.jpg" },
+            { lat: 42.86811292987424, lng: -77.24190498609116, name: "SUNY Finger Lakes CC (FLCC)", type: "SUNY", homepageUrl: "https://www.flcc.edu/", imageUrl: "https://www.suny.edu/media/suny/content-assets/images/campus-profiles/logos/fingerlakes.jpg" },
             { lat: 42.4532, lng: -79.3407, name: "SUNY Fredonia", type: "SUNY", homepageUrl: "https://www.fredonia.edu/", imageUrl: "https://www.wrfalp.com/wp-content/uploads/2014/06/Logo_Stacked_RGB.jpg" },
-            { lat: 42.9842, lng: -74.2946, name: "SUNY Fulton-Montgomery CC", type: "SUNY", homepageUrl: "https://www.fmcc.edu/", imageUrl: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRNbFa4BgHSFLgQwgX_j-tPfnN8Bzeq1y3ptg&s" },
+            { lat: 42.9842, lng: -74.2946, name: "SUNY Fulton-Montgomery CC (FMCC)", type: "SUNY", homepageUrl: "https://www.fmcc.edu/", imageUrl: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRNbFa4BgHSFLgQwgX_j-tPfnN8Bzeq1y3ptg&s" },
             { lat: 42.7960, lng: -77.8239, name: "SUNY Geneseo", type: "SUNY", homepageUrl: "https://www.geneseo.edu/", imageUrl: "https://www.geneseo.edu/sites/default/files/styles/news_article/public/sites/news/geneseo-logo-v1.jpg?itok=vOjU7lMk" },
-            { lat: 43.0159, lng: -78.1404, name: "SUNY Genesee CC", type: "SUNY", homepageUrl: "https://www.genesee.edu/", imageUrl: "https://upload.wikimedia.org/wikipedia/commons/7/71/SUNY_Genesee_Community_College_Logo.png" },
-            { lat: 43.03238186937195, lng: -75.00619715805787, name: "SUNY Herkimer CC", type: "SUNY", homepageUrl: "https://www.herkimer.edu/", imageUrl: "https://www.herkimer.edu/assets/Uploads/site-og.png" },
-            { lat: 42.6958, lng: -73.6835, name: "SUNY Hudson Valley CC", type: "SUNY", homepageUrl: "https://www.hvcc.edu/", imageUrl: "https://acadweb.hvcc.edu/~j.hamilton/HVCClogo_green.jpg" },
-            { lat: 42.11604061161321,  lng:-79.22007747268458, name: "SUNY Jamestown CC", type: "SUNY", homepageUrl: "https://www.sunyjcc.edu/", imageUrl: "https://www.sunyjcc.edu/sites/default/files/brand/Brand-Logo-SUNY2c.png" },
+            { lat: 43.0159, lng: -78.1404, name: "SUNY Genesee CC (GCC)", type: "SUNY", homepageUrl: "https://www.genesee.edu/", imageUrl: "https://upload.wikimedia.org/wikipedia/commons/7/71/SUNY_Genesee_Community_College_Logo.png" },
+            { lat: 43.03238186937195, lng: -75.00619715805787, name: "SUNY Herkimer CC (HCC)", type: "SUNY", homepageUrl: "https://www.herkimer.edu/", imageUrl: "https://www.herkimer.edu/assets/Uploads/site-og.png" },
+            { lat: 42.6958, lng: -73.6835, name: "SUNY Hudson Valley CC (HVCC)", type: "SUNY", homepageUrl: "https://www.hvcc.edu/", imageUrl: "https://acadweb.hvcc.edu/~j.hamilton/HVCClogo_green.jpg" },
+            { lat: 42.11604061161321,  lng:-79.22007747268458, name: "SUNY Jamestown CC (JCC)", type: "SUNY", homepageUrl: "https://www.sunyjcc.edu/", imageUrl: "https://www.sunyjcc.edu/sites/default/files/brand/Brand-Logo-SUNY2c.png" },
+            { lat: 41.87728272052967,  lng:-79.14839017282013, name: "SUNY Jamestown CC (JCC) - Warren Center", type: "SUNY", homepageUrl: "https://www.sunyjcc.edu/", imageUrl: "https://www.sunyjcc.edu/sites/default/files/brand/Brand-Logo-SUNY2c.png" },
+            { lat: 42.46873730831684,   lng:-79.31927131558331, name: "SUNY Jamestown CC (JCC) - North County Center", type: "SUNY", homepageUrl: "https://www.sunyjcc.edu/", imageUrl: "https://www.sunyjcc.edu/sites/default/files/brand/Brand-Logo-SUNY2c.png" },
             { lat: 43.99226937426917,  lng: -75.93464949752885, name: "SUNY Jefferson CC", type: "SUNY", homepageUrl: "https://www.sunyjefferson.edu/", imageUrl: "https://upload.wikimedia.org/wikipedia/commons/thumb/3/3f/Jefferson_Community_College_Logo_SUNY.svg/512px-Jefferson_Community_College_Logo_SUNY.svg.png?20220204202922" },
             { lat: 40.8053, lng: -73.7925, name: "SUNY Maritime", type: "SUNY", homepageUrl: "https://www.sunymaritime.edu/", imageUrl: "https://seekvectorlogo.net/wp-content/uploads/2020/01/maritime-college-state-university-of-new-york-vector-logo.png" },
-            { lat: 43.0775, lng: -75.2175, name: "SUNY Mohawk Valley CC", type: "SUNY", homepageUrl: "https://www.mvcc.edu/", imageUrl: "https://upload.wikimedia.org/wikipedia/commons/3/38/Mvcclogo.png" },
-            { lat: 43.10139961330324,  lng: -77.6104301006351, name: "SUNY Monroe CC", type: "SUNY", homepageUrl: "https://www.monroecc.edu/", imageUrl: "https://www.suny.edu/media/suny/content-assets/images/campus-profiles/logos/monroe.jpg" },
+            { lat: 43.0775, lng: -75.2175, name: "SUNY Mohawk Valley CC (MVCC)", type: "SUNY", homepageUrl: "https://www.mvcc.edu/", imageUrl: "https://upload.wikimedia.org/wikipedia/commons/3/38/Mvcclogo.png" },
+            { lat: 43.10139961330324,  lng: -77.6104301006351, name: "SUNY Monroe CC (MCC)", type: "SUNY", homepageUrl: "https://www.monroecc.edu/", imageUrl: "https://www.suny.edu/media/suny/content-assets/images/campus-profiles/logos/monroe.jpg" },
             { lat: 42.89355206439681, lng:  -75.6405606347055, name: "SUNY Morrisville", type: "SUNY", homepageUrl: "https://www.morrisville.edu/", imageUrl: "https://www.morrisville.edu/sites/default/files/Morrisville_Identity_Mustang_SUNY%20Morrisville_RGB_0.png" },
-            { lat: 40.7299, lng: -73.5922, name: "SUNY Nassau CC", type: "SUNY", homepageUrl: "https://www.ncc.edu/", imageUrl: "https://www.ncc.edu/aboutncc/ourpeople/administration/institutional_advancement/logos/NCCWeb.jpg" },
+            { lat: 40.7299, lng: -73.5922, name: "SUNY Nassau CC (NCC)", type: "SUNY", homepageUrl: "https://www.ncc.edu/", imageUrl: "https://www.ncc.edu/aboutncc/ourpeople/administration/institutional_advancement/logos/NCCWeb.jpg" },
             { lat: 41.7386, lng: -74.0852, name: "SUNY New Paltz", type: "SUNY", homepageUrl: "https://www.newpaltz.edu/", imageUrl: "https://www.newpaltz.edu/media/ocm/toolkit/the-new-paltz-brand/vdp_pg13-2415x873.jpg" },
-            { lat: 43.146, lng: -78.8787, name: "SUNY Niagara CC", type: "SUNY", homepageUrl: "https://www.niagaracc.suny.edu/", imageUrl: "https://upload.wikimedia.org/wikipedia/commons/2/2b/SUNY_Niagara_logo.jpg" },
+            { lat: 43.146, lng: -78.8787, name: "SUNY Niagara CC (NCCC)", type: "SUNY", homepageUrl: "https://www.niagaracc.suny.edu/", imageUrl: "https://upload.wikimedia.org/wikipedia/commons/2/2b/SUNY_Niagara_logo.jpg" },
             { lat: 44.3192, lng: -74.1196, name: "SUNY North Country CC", type: "SUNY", homepageUrl: "https://www.nccc.edu/", imageUrl: "https://www.suny.edu/media/suny/content-assets/images/campus-profiles/logos/northcountry.jpg" },
-            { lat: 42.253260, lng: -77.787490, name: "SUNY New York State College of Ceramics @ Alfred University ", type: "SUNY", homepageUrl: "https://www.alfred.edu/academics/colleges-schools/college-ceramics/index.cfm", imageUrl: "x" },
+            { lat: 42.253260, lng: -77.787490, name: "SUNY New York State College of Ceramics @ Alfred University (NYSCC)", type: "SUNY", homepageUrl: "https://www.alfred.edu/academics/colleges-schools/college-ceramics/index.cfm", imageUrl: "x" }, // Placeholder image
             { lat: 40.7971, lng: -73.5718, name: "SUNY Old Westbury", type: "SUNY", homepageUrl: "https://www.oldwestbury.edu/", imageUrl: "https://www.hanoverresearch.com/wp-content/uploads/2024/12/suny-old-westbury.png" },
-            { lat: 43.006167, lng: -76.197306, name: "SUNY Onondaga CC", type: "SUNY", homepageUrl: "https://www.sunyocc.edu/", imageUrl: "https://www.suny.edu/media/suny/content-assets/images/campus-profiles/logos/onondaga.jpg" },
+            { lat: 43.006167, lng: -76.197306, name: "SUNY Onondaga CC (OCC)", type: "SUNY", homepageUrl: "https://www.sunyocc.edu/", imageUrl: "https://www.suny.edu/media/suny/content-assets/images/campus-profiles/logos/onondaga.jpg" },
             { lat: 42.46926980228614, lng: -75.06314601599716, name: "SUNY Oneonta", type: "SUNY", homepageUrl: "https://suny.oneonta.edu/", imageUrl: "https://www.suny.edu/media/suny/content-assets/images/campus-profiles/logos/oneonta.jpg" },
             { lat: 40.7544, lng: -73.9823, name: "SUNY Optometry", type: "SUNY", homepageUrl: "https://www.sunyopt.edu/", imageUrl: "https://www.sunyopt.edu/wp-content/uploads/2019/11/SUNY-Logo-Centered.png" },
-            { lat: 41.4399, lng: -74.4269, name: "SUNY Orange CC", type: "SUNY", homepageUrl: "https://sunyorange.edu/", imageUrl: "https://hvcu2022.wellnessiq.org/wp-content/uploads/sites/42/2022/06/suny-orange-community-college-logo.png" },
+            { lat: 41.4399, lng: -74.4269, name: "SUNY Orange County CC (OCCC)", type: "SUNY", homepageUrl: "https://sunyorange.edu/", imageUrl: "https://hvcu2022.wellnessiq.org/wp-content/uploads/sites/42/2022/06/suny-orange-community-college-logo.png" },
             { lat: 43.4509, lng: -76.5434, name: "SUNY Oswego", type: "SUNY", homepageUrl: "https://www.oswego.edu/", imageUrl: "https://acrl.ala.org/residency/wp-content/uploads/2017/07/oswego_logo_vert_grn.jpg" },
             { lat: 44.6926, lng: -73.4669, name: "SUNY Plattsburgh", type: "SUNY", homepageUrl: "https://www.plattsburgh.edu/", imageUrl: "https://upload.wikimedia.org/wikipedia/en/thumb/6/6b/SUNY_Plattsburgh_seal.svg/1200px-SUNY_Plattsburgh_seal.svg.png" },
             { lat: 43.1375, lng: -75.2273, name: "SUNY Polytechnic Institute (Poly)", type: "SUNY", homepageUrl: "https://sunypoly.edu/", imageUrl: "https://www.suny.edu/media/suny/content-assets/images/campus-profiles/logos/SUNY-Poly-logo-new.jpg" },
             { lat: 44.6615, lng: -74.9730, name: "SUNY Potsdam", type: "SUNY", homepageUrl: "https://www.potsdam.edu/", imageUrl: "https://www.potsdam.edu/sites/default/files/potsdam_red.jpg" },
             { lat: 41.0471, lng: -73.7004, name: "SUNY Purchase", type: "SUNY", homepageUrl: "https://www.purchase.edu/", imageUrl: "https://www.purchase.edu/live/files/5278-purchase-logo-purple-cmyk-jpg" },
-            { lat: 41.1324, lng: -74.0874, name: "SUNY Rockland CC", type: "SUNY", homepageUrl: "https://sunyrockland.edu/", imageUrl: "https://www.suny.edu/media/suny/content-assets/images/campus-profiles/logos/rockland.jpg" },
-            { lat: 40.9041, lng: -73.1238, name: "SUNY Stony Brook", type: "SUNY", homepageUrl: "https://www.stonybrook.edu/", imageUrl: "https://www.master-of-finance.org/wp-content/uploads/2018/07/stony-brook-university-300x250.png" },
-            { lat: 42.8145, lng: -73.9508, name: "SUNY Schenectady CC", type: "SUNY", homepageUrl: "https://sunysccc.edu/", imageUrl: "https://sunysccc.edu/images/About%20Us/Marketing/SUNY%20Schenectady%20CC%20stacked.png" },
-            { lat: 40.8484, lng: -73.0562, name: "SUNY Suffolk County CC", type: "SUNY", homepageUrl: "https://www.sunysuffolk.edu/", imageUrl: "https://www.sunysuffolk.edu/about-suffolk/office-of-planning-and-institutional-effectiveness/wp-content/uploads/2022/04/sccc-logo-large-2x-001489-1030x313.png" },
+            { lat: 41.1324, lng: -74.0874, name: "SUNY Rockland CC (RCC)", type: "SUNY", homepageUrl: "https://sunyrockland.edu/", imageUrl: "https://www.suny.edu/media/suny/content-assets/images/campus-profiles/logos/rockland.jpg" },
+            { lat: 40.9041, lng: -73.1238, name: "SUNY Stony Brook (SBU)", type: "SUNY", homepageUrl: "https://www.stonybrook.edu/", imageUrl: "https://www.master-of-finance.org/wp-content/uploads/2018/07/stony-brook-university-300x250.png" },
+            { lat: 42.8145, lng: -73.9508, name: "SUNY Schenectady CC (SCC)", type: "SUNY", homepageUrl: "https://sunysccc.edu/", imageUrl: "https://sunysccc.edu/images/About%20Us/Marketing/SUNY%20Schenectady%20CC%20stacked.png" },
+            { lat: 40.8484, lng: -73.0562, name: "SUNY Suffolk County CC (SCCC)", type: "SUNY", homepageUrl: "https://www.sunysuffolk.edu/", imageUrl: "https://www.sunysuffolk.edu/about-suffolk/office-of-planning-and-institutional-effectiveness/wp-content/uploads/2022/04/sccc-logo-large-2x-001489-1030x313.png" },
             { lat: 41.7639599662426, lng: -74.66891537591786, name: "SUNY Sullivan CC", type: "SUNY", homepageUrl: "https://sunysullivan.edu/", imageUrl: "https://sunysullivan.edu/wp-content/uploads/2020/12/cropped-SUNY-sullivan-logo.png" },
-            { lat: 42.5037, lng: -76.2908, name: "SUNY Tompkins Cortland CC", type: "SUNY", homepageUrl: "https://www.tompkinscortland.edu/", imageUrl: "https://www.suny.edu/media/suny/content-assets/images/campus-profiles/logos/tompkinscortland.jpg" },
-            { lat: 43.0018, lng: -78.7895, name: "SUNY UBuffalo (North Campus)", type: "SUNY", homepageUrl: "https://www.buffalo.edu/", imageUrl: "https://upload.wikimedia.org/wikipedia/commons/6/60/University_at_Buffalo_logo.png" },
+            { lat: 42.5037, lng: -76.2908, name: "SUNY Tompkins Cortland CC (TC3)", type: "SUNY", homepageUrl: "https://www.tompkinscortland.edu/", imageUrl: "https://www.suny.edu/media/suny/content-assets/images/campus-profiles/logos/tompkinscortland.jpg" },
+            { lat: 43.0018, lng: -78.7895, name: "SUNY UBuffalo (North Campus)", person: "David", type: "SUNY", homepageUrl: "https://www.buffalo.edu/", imageUrl: "https://upload.wikimedia.org/wikipedia/commons/6/60/University_at_Buffalo_logo.png" },
             { lat: 42.953444546476916, lng: -78.81826987114768, name: "SUNY UBuffalo (South Campus)", type: "SUNY", homepageUrl: "https://www.buffalo.edu/", imageUrl: "https://upload.wikimedia.org/wikipedia/commons/6/60/University_at_Buffalo_logo.png" },
             { lat: 42.89984382356488,  lng: -78.86917542474217, name: "SUNY UBuffalo (Downtown Campus)", type: "SUNY", homepageUrl: "https://www.buffalo.edu/", imageUrl: "https://upload.wikimedia.org/wikipedia/commons/6/60/University_at_Buffalo_logo.png" },
             { lat: 41.8529, lng: -74.1312, name: "SUNY Ulster CC", type: "SUNY", homepageUrl: "https://www.sunyulster.edu/", imageUrl: "https://inside.sunyulster.edu/identity/images/2020-suny-ulster-logo/2020-suny-ulster-logo-blue/2020-suny-ulster-logo-blue.jpg" },
             { lat: 43.042029, lng: -76.139620, name: "SUNY Upstate Medical University", type: "SUNY", homepageUrl: "https://www.upstate.edu/", imageUrl: "https://images.credly.com/images/05f82a1e-f836-4dff-be75-ddfd20b5f4d6/blob.png" },
-            { lat: 41.0667, lng: -73.7903, name: "SUNY Westchester CC", type: "SUNY", homepageUrl: "https://www.sunywcc.edu/", imageUrl: "https://www.sunywcc.edu/CMS/wp-content/uploads/style-guide/web-images/logo-sunywcc.jpg" },
+            { lat: 41.0667, lng: -73.7903, name: "SUNY Westchester CC (WCC)", type: "SUNY", homepageUrl: "https://www.sunywcc.edu/", imageUrl: "https://www.sunywcc.edu/CMS/wp-content/uploads/style-guide/web-images/logo-sunywcc.jpg" },
             { lat: 37.37677960113365, lng: 126.66721043168027, name: "SUNY Korea", type: "SUNY", homepageUrl: "https://www.sunykorea.ac.kr/en/", imageUrl: "https://www.stonybrook.edu/commcms/est/_images/SUNY%20Korea%20Logo%2012.2.png" }
         ];
-        const cunyCampuses = [ /* ... CUNY data remains the same ... */
+        const cunyCampuses = [
             { lat: 40.7404, lng: -73.9832, name: "CUNY Baruch College", person: "Norman", type: "CUNY", imageUrl: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRjeFAV6ipn_I_ijO_HY8NtztoDY3XTt4oRPA&s", homepageUrl: "https://www.baruch.cuny.edu/" },
             { lat: 40.7179, lng: -74.0120, name: "CUNY Borough of Manhattan CC", type: "CUNY", homepageUrl: "https://www.bmcc.cuny.edu/", imageUrl: "https://bmccprodstroac.blob.core.windows.net/uploads/2022/01/logo-2line-300x195.jpg" },
             { lat: 40.8575, lng: -73.9129, name: "CUNY Bronx CC", type: "CUNY", homepageUrl: "https://www.bcc.cuny.edu/", imageUrl: "https://www.bcc.cuny.edu/wp-content/uploads/2019/03/bcc-logo-in-outlines.png" },
             { lat: 40.6309, lng: -73.9515, name: "CUNY Brooklyn College", type: "CUNY", homepageUrl: "https://www.brooklyn.cuny.edu/", imageUrl: "https://upload.wikimedia.org/wikipedia/commons/thumb/4/43/Brooklyn_College_Logo.svg/2560px-Brooklyn_College_Logo.svg.png" },
             { lat: 40.8194, lng: -73.9500, name: "CUNY City College", type: "CUNY", homepageUrl: "https://www.ccny.cuny.edu/", imageUrl: "https://www.ccny.cuny.edu/sites/default/files/2022-06/RGB_CNNY_Horizontal_Version_P2665C.png" },
             { lat: 40.6954, lng: -73.9875, name: "CUNY CityTech", type: "CUNY", homepageUrl: "https://www.citytech.cuny.edu/", imageUrl: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRUufVAsr5OrhWvrcJBkbSFf18LdVVP30wWug&s" },
-            { lat: 40.6022, lng: -74.1504, name: "CUNY College of Staten Island", type: "CUNY", homepageUrl: "https://www.csi.cuny.edu/", imageUrl: "https://academicworks.cuny.edu/assets/md5images/514e3c424d39651db69ee26172128457.jpg" },
+            { lat: 40.6022, lng: -74.1504, name: "CUNY College of Staten Island (CSI)", type: "CUNY", homepageUrl: "https://www.csi.cuny.edu/", imageUrl: "https://academicworks.cuny.edu/assets/md5images/514e3c424d39651db69ee26172128457.jpg" },
             { lat: 40.7486, lng: -73.9840, name: "CUNY Graduate Center", type: "CUNY", homepageUrl: "https://www.gc.cuny.edu/", imageUrl: "https://user-content.givegab.com/uploads/group/logo/437311/99c913fca0b82ca16053500349fdab517d93f481.png" },
             { lat: 40.8174, lng: -73.9272, name: "CUNY Hostos CC", type: "CUNY", homepageUrl: "https://www.hostos.cuny.edu/", imageUrl: "https://www.hostos.cuny.edu/getmedia/6221fdfa-4f8f-4d9e-9a69-bcf2776bc29f/Brand-Asset_Hostos-CUNY-Pri-HOR_1.aspx;.gif;;?width=250&height=144" },
             { lat: 40.7678, lng: -73.9645, name: "CUNY Hunter College", type: "CUNY", homepageUrl: "https://hunter.cuny.edu/", imageUrl: "https://upload.wikimedia.org/wikipedia/commons/9/98/Hunter_college_logo.png" },
@@ -255,145 +269,201 @@
             { lat: 40.774000, lng: -73.980200, name: "CUNY Macauly Honors College", type: "CUNY", homepageUrl: "https://macaulay.cuny.edu/", imageUrl: "https://macaulay.cuny.edu/wp-content/uploads/2018/05/Screenshot-2018-05-18-15.03.54.png" },
             { lat: 40.82106629702918, lng: -73.95034367770154, name: "CUNY School of Medicine", type: "CUNY", homepageUrl: "https://medicine.cuny.edu/", imageUrl: "https://upload.wikimedia.org/wikipedia/commons/3/3e/CUNY_Medicine_logo.png" }
         ];
-        const ivycampuses = [ /* ... Ivy League data remains the same ... */
+        const ivycampuses = [
             { lat: 41.826820, lng: -71.402931, name: "Brown University", type: "Ivy League", homepageUrl: "https://www.brown.edu/", imageUrl: "https://thebruinclub.wordpress.com/wp-content/uploads/2013/11/brown_logo.gif" },
             { lat: 40.807384, lng: -73.963036, name: "Columbia University", type: "Ivy League", homepageUrl: "https://www.columbia.edu/", imageUrl: "https://upload.wikimedia.org/wikipedia/commons/thumb/b/b0/Columbia_coat_of_arms_no_crest.svg/640px-Columbia_coat_of_arms_no_crest.svg.png" },
+            { lat: 31.991241725825844,  lng: 35.82822750125768, name: "Columbia Global Center (Amman)", type: "Ivy League", homepageUrl: "https://globalcenters.columbia.edu/amman", imageUrl: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQS9gbQJMg5UM_ZeWYkx3XYhro2xTyx_4nRm9vAqPQFJzlxTqEgNB0v-Kx-LblT1pjYHHQ&usqp=CAU_" },
+            { lat:  40.81187879051901,   lng: -73.96316937521802, name: "Columbia Global Center (Athens)", type: "Ivy League", homepageUrl: " https://globalcenters.columbia.edu/athens", imageUrl: "https://media.licdn.com/dms/image/v2/D560BAQGvJQVsdxCHBw/company-logo_200_200/company-logo_200_200/0/1734708529969?e=2147483647&v=beta&t=ryxLWvekCHMkWE9Xo_lKfrObR4neizT71bEWFyWTNO8" },
+            { lat:  39.98063711724939, lng: 116.30858600618431, name: "Columbia Global Center (Beijing)", type: "Ivy League", homepageUrl: "https://globalcenters.columbia.edu/beijing ", imageUrl: " https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTashOQfCUsJcrXQYsnJuDpJrMy5Wx6u15tpg&s" },
+            { lat:  41.03439241186797, lng: 28.98458072493678,  name: "Columbia Global Center (Istanbul)", type: "Ivy League", homepageUrl: "https://globalcenters.columbia.edu/istanbul  ", imageUrl: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTfOqHwI3ks1Wx_0CTwvfxM2XxYtoRSvpER7g&s " },
+            { lat:  18.92398737355199, lng: 72.82222599591415,  name: "Columbia Global Center (Mumbai)", type: "Ivy League", homepageUrl: " https://globalcenters.columbia.edu/mumbai", imageUrl: " https://globalcenters.columbia.edu/sites/default/files/styles/cu_crop/public/content/What%20We%20Do.png?itok=mlWgqy03" },
+            { lat:  -1.260648122046748, lng: 36.7842405595951, name: "Columbia Global Center (Nairobi)", type: "Ivy League", homepageUrl: " https://globalcenters.columbia.edu/nairobi", imageUrl: " https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRIqdWFE6Mc1xU2kz00tzn8bwe8SJIlBaNQCw&s" },
+            { lat:  48.841973020898195,  lng: 2.3316883477019106,  name: "Columbia Global Center (Paris)", type: "Ivy League", homepageUrl: "https://globalcenters.columbia.edu/paris ", imageUrl: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcT8AqO7x3Y2zWBVttgfPhUlyNhRk6vwlaADwA&s " },
+            { lat:  -22.90143329703961,  lng: -43.17725656044905, name: "Columbia Global Center (Rio De Janeiro)", type: "Ivy League", homepageUrl: "https://globalcenters.columbia.edu/rio ", imageUrl: "https://media.licdn.com/dms/image/v2/D4D0BAQEL26VO3RhKbw/company-logo_200_200/company-logo_200_200/0/1709042515875/columbiaglobalcentersrio_logo?e=2147483647&v=beta&t=cPCpF6bO_T3du2oJbFXfVK_GhNcteFqBBxcAM0Q4Cns " },
+            { lat:  -33.40444164123445,  lng: -70.60031095602636, name: "Columbia Global Center (Santiago)", type: "Ivy League", homepageUrl: "https://globalcenters.columbia.edu/santiago ", imageUrl: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQvBDu8EkD8rkNIKrnvMqxIPRDE019mL-_Vcg&s " },
+            { lat:  40.81187879051901,   lng: -73.96316937521802,  name: "Columbia Global Center (Tel Aviv)", type: "Ivy League", homepageUrl: "https://globalcenters.columbia.edu/tel-aviv ", imageUrl: " https://globalcenters.columbia.edu/sites/default/files/styles/cu_crop/public/content/NYC/Homepage/rotating%20hero/2023/HomePageHeroTel-Aviv-04.jpg?itok=ApeEXSsi" },
+            { lat:  36.83142094344671,  lng: 10.230661854502376,  name: "Columbia Global Center (Tunis)", type: "Ivy League", homepageUrl: "https://globalcenters.columbia.edu/tunis ", imageUrl: " https://globalcenters.columbia.edu/sites/default/files/styles/cu_crop/public/content/NYC/News%20page/2022/Tunis-logo600px.jpg?itok=9bGhf6-z" },
+            { lat:  39.907669814197654, lng: 116.45293210808265,  name: "Yale Center Beijing", type: "Ivy League", homepageUrl: " https://centerbeijing.yale.edu/ ", imageUrl: " https://media.licdn.com/dms/image/v2/C510BAQE4DGVVSIR3mQ/company-logo_200_200/company-logo_200_200/0/1630565988496?e=2147483647&v=beta&t=bQ6NfnZekokJK2Cl2yqdBppfOG4uSdX3dKbs0kXCtmk" },
+            { lat:  1.306954136917099,  lng: 103.76939740391688,  name: "Yale-NUS College", type: "Ivy League", homepageUrl: " https://www.yale-nus.edu.sg/ ", imageUrl: "https://upload.wikimedia.org/wikipedia/commons/thumb/1/17/Yale-NUS_College_logo.svg/1200px-Yale-NUS_College_logo.svg.png" },
+            { lat:  40.75565415945747, lng: -73.95614494020782,  name: "Cornell Tech", type: "Ivy League", homepageUrl: "https://tech.cornell.edu/ ", imageUrl: "https://sciencesprings.wordpress.com/wp-content/uploads/2017/09/cornell-tech-bloc.jpg?w=640 " },
+            { lat:  25.318149296067116, lng: 51.44024126299473,  name: "Weill Cornell Medicine - Qatar ", type: "Ivy League", homepageUrl: "https://qatar-weill.cornell.edu/ ", imageUrl: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQgScN_nUDI_vsvMV2LAUMfNYofW_WtHyQbwA&s " },
+            { lat:  41.893933352198175, lng: 12.474957242539457,  name: "Cornell in Rome", type: "Ivy League", homepageUrl: " https://aap.cornell.edu/academics/rome", imageUrl: "https://images.seeklogo.com/logo-png/19/2/cornell-university-logo-png_seeklogo-190243.png" },
+            { lat:  39.90772744247958, lng: 116.45299632421602,  name: "Cornell China Center", type: "Ivy League", homepageUrl: " ", imageUrl: " https://business.cornell.edu/wp-content/uploads/sites/2/2024/01/logo.png" },
             { lat: 42.454323, lng: -76.475266, name: "Cornell University", type: "Ivy League", homepageUrl: "https://www.cornell.edu/", imageUrl: "https://images.seeklogo.com/logo-png/19/2/cornell-university-logo-png_seeklogo-190243.png" },
             { lat: 43.704540, lng: -72.288986, name: "Dartmouth College", type: "Ivy League", homepageUrl: "https://home.dartmouth.edu/", imageUrl: "https://logolook.net/wp-content/uploads/2024/04/Dartmouth-College-Logo.png" },
             { lat: 42.374443, lng: -71.116943, name: "Harvard University", type: "Ivy League", homepageUrl: "https://www.harvard.edu/", imageUrl: "https://upload.wikimedia.org/wikipedia/commons/thumb/c/cc/Harvard_University_coat_of_arms.svg/1200px-Harvard_University_coat_of_arms.svg.png" },
             { lat: 40.343899, lng: -74.660049, name: "Princeton University", type: "Ivy League", homepageUrl: "https://www.princeton.edu/", imageUrl: "https://upload.wikimedia.org/wikipedia/commons/thumb/d/d0/Princeton_seal.svg/1200px-Princeton_seal.svg.png" },
-            { lat: 39.952305, lng: -75.193703, name: "University of Pennsylvania", type: "Ivy League", homepageUrl: "https://www.upenn.edu/", imageUrl: "https://branding.web-resources.upenn.edu/sites/default/files/styles/card_3x2/public/2022-03/UniversityofPennsylvania_Shield_RGB-2.png?h=3c287ac3&itok=HgG1DNc-" },
+            { lat: 39.952305, lng: -75.193703, name: "University of Pennsylvania (UPenn)", type: "Ivy League", homepageUrl: "https://www.upenn.edu/", imageUrl: "https://branding.web-resources.upenn.edu/sites/default/files/styles/card_3x2/public/2022-03/UniversityofPennsylvania_Shield_RGB-2.png?h=3c287ac3&itok=HgG1DNc-" },
+            { lat: 39.90795811911441, lng: 116.45933555297337, name: "Penn Wharton China Center", type: "Ivy League", homepageUrl: "https://pwcc.upenn.edu/", imageUrl: "https://pwcc.upenn.edu/wp-content/uploads/2017/11/PWCCreversetext.png" },
             { lat: 41.316307, lng: -72.922585, name: "Yale University", type: "Ivy League", homepageUrl: "https://www.yale.edu/", imageUrl: "https://upload.wikimedia.org/wikipedia/commons/thumb/6/6e/Yale_University_logo.svg/500px-Yale_University_logo.svg.png" },
         ];
-        // NEW: Data for NYU and NEU
         const otherPrivateCampuses = [
-             { lat: 40.7295, lng: -73.9965, name: "New York University (NYU)", type: TYPE_OTHER_PRIVATE, homepageUrl: "https://www.nyu.edu/", imageUrl: "https://yt3.ggpht.com/-RZYi5isxH_M/AAAAAAAAAAI/AAAAAAAAAAA/rmWpoe2qZzI/s900-c-k-no/photo.jpg" },
-             { lat: 42.3398, lng: -71.0892, name: "Northeastern University (NEU)", type: TYPE_OTHER_PRIVATE, homepageUrl: "https://www.northeastern.edu/", imageUrl: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQj8Gdl0Gui9xl5q_D4acxRtSg-k4HVkE5dYQ&s" }
+             { lat: 40.7295, lng: -73.9965, name: "New York University (NYU)", person: "Matthew", type: TYPE_OTHER_PRIVATE, homepageUrl: "https://www.nyu.edu/", imageUrl: "https://yt3.ggpht.com/-RZYi5isxH_M/AAAAAAAAAAI/AAAAAAAAAAA/rmWpoe2qZzI/s900-c-k-no/photo.jpg" },
+             { lat: 24.524026631271706, lng: 54.43454506641482  , name: "NYU Abu Dhabi", type: TYPE_OTHER_PRIVATE, homepageUrl: "https://nyuad.nyu.edu/en/ ", imageUrl: "https://www.iie.org/wp-content/uploads/2024/09/nyuad-logo.png " },
+             { lat: 31.225657062763396,  lng: 121.53378580506225, name: "NYU Shanghai", type: TYPE_OTHER_PRIVATE, homepageUrl: " https://shanghai.nyu.edu/", imageUrl: "https://upload.wikimedia.org/wikipedia/en/thumb/3/3b/NYU_Shanghai_logo.svg/1200px-NYU_Shanghai_logo.svg.png " },
+             { lat: 35.209081990141534, lng:-80.86242816759069 , name: "NEU Charlotte", type: TYPE_OTHER_PRIVATE, homepageUrl: "https://charlotte.northeastern.edu/ ", imageUrl: " https://img.evbuc.com/https%3A%2F%2Fcdn.evbuc.com%2Fimages%2F984297883%2F1648776284553%2F1%2Foriginal.20250314-230714?crop=focalpoint&fit=crop&h=230&w=460&auto=format%2Ccompress&q=75&sharp=10&fp-x=0.5&fp-y=0.5&s=0282e03d9deef2367c7af3de84f2a12c" },
+             { lat: 38.89370084977361, lng: -77.07262985062209, name: "NEU Arlington", type: TYPE_OTHER_PRIVATE, homepageUrl: "https://arlington.northeastern.edu/ ", imageUrl: "https://innovationsoftheworld.com/wp-content/uploads/2024/05/North-Eastern-University-Arlington-logo-BW.png " },
+             { lat: 42.47836753620001, lng: -71.19168414192413, name: "NEU Burlington", type: TYPE_OTHER_PRIVATE, homepageUrl: " https://www.burlington.northeastern.edu/", imageUrl: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQj8Gdl0Gui9xl5q_D4acxRtSg-k4HVkE5dYQ&s " },
+             { lat: 42.41864490998119, lng: -70.90717610679035, name: "NEU Marine Science Center (Nahant)", type: TYPE_OTHER_PRIVATE, homepageUrl: "https://cos.northeastern.edu/marinescience/ ", imageUrl: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQj8Gdl0Gui9xl5q_D4acxRtSg-k4HVkE5dYQ&s" },
+             { lat: 25.799877304637192, lng: -80.19965221711811, name: "NEU Miami", type: TYPE_OTHER_PRIVATE, homepageUrl: "https://miami.northeastern.edu/ ", imageUrl: "https://i.ytimg.com/vi/UCWlKXFi604/maxresdefault.jpg " },
+             { lat: 40.76874089458012,  lng: -73.95978937402339, name: "NEU New York", type: TYPE_OTHER_PRIVATE, homepageUrl: "https://president.northeastern.edu/2024/05/29/northeastern-university-new-york-city/ ", imageUrl: "https://news.northeastern.edu/wp-content/uploads/2024/05/Marymount1400.jpg " },
+             { lat: 37.78064175482694,  lng: -122.18257629487883, name: "NEU Oakland", type: TYPE_OTHER_PRIVATE, homepageUrl: "https://oakland.northeastern.edu/ ", imageUrl: "https://media.licdn.com/dms/image/v2/D560BAQGaJ0Pb5gKnjA/company-logo_200_200/company-logo_200_200/0/1698429275044/mills_college_at_northeastern_university_logo?e=2147483647&v=beta&t=y791BMSZCVgS8Kxx_FkbPBs9eY62zAH9H9VukAnDkRM " },
+             { lat: 43.66158204300303,  lng: -70.24661921253185, name: "NEU Roux Institute (Portland)", type: TYPE_OTHER_PRIVATE, homepageUrl: "https://graduate.northeastern.edu/global-campus-network/portland-campus/ ", imageUrl: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRgaJuRtOJXSYWIOekAAOj3J30_wGLI58Hs6g&s " },
+             { lat: 37.33753825032523,  lng: -121.88980905428355, name: "NEU Silicon Valley", type: TYPE_OTHER_PRIVATE, homepageUrl: "https://siliconvalley.northeastern.edu/ ", imageUrl: "https://lugoldedc.com/wp-content/uploads/2020/10/silicon-valley-logo.png " },
+             { lat: 47.62291930385927,  lng: -122.33738984073302, name: "NEU Seattle", type: TYPE_OTHER_PRIVATE, homepageUrl: "https://seattle.northeastern.edu/ ", imageUrl: " https://res.cloudinary.com/micronetonline/image/upload/c_crop,h_600,w_1000,x_0,y_0/f_auto/q_auto:best/v1678917165/tenants/f274748b-eac7-4fb3-980f-770b4e695166/41392ca949d648ac8340e8bf57a4e7af/ExperienceSLU-NortheasternLogo.png" },
+             { lat: 51.50615217421921,  lng: -0.07125367105268134, name: "NEU London", type: TYPE_OTHER_PRIVATE, homepageUrl: " https://www.nulondon.ac.uk/", imageUrl: "https://nul.repository.guildhe.ac.uk/images/NUL_logo.png " },
+             { lat: 43.64869809608891,  lng: -79.3818194869634, name: "NEU Toronto", type: TYPE_OTHER_PRIVATE, homepageUrl: "https://toronto.northeastern.edu/ ", imageUrl: "https://lifesciencesontario.ca/wp-content/uploads/2020/02/NU_Toronto_MonoNU_02_RB.png " },
+             { lat: 49.28079152429839,  lng: -123.11547270196257, name: "NEU Vancouver", type: TYPE_OTHER_PRIVATE, homepageUrl: "https://vancouver.northeastern.edu/ ", imageUrl: "https://vancouverevents.sites.northeastern.edu/files/2024/02/cropped-NU_Vancouver_MonoNU_02_RB-f0881479862ea803.jpg " },
+             { lat: 42.3398, lng: -71.0892, name: "Northeastern University (NEU)", person: "Jason", type: TYPE_OTHER_PRIVATE, homepageUrl: "https://www.northeastern.edu/", imageUrl: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQj8Gdl0Gui9xl5q_D4acxRtSg-k4HVkE5dYQ&s" },
+             { lat: 40.4237, lng: -86.9212, name: "Purdue University", person: "Ashton", type: "Purdue University System", homepageUrl: "https://www.purdue.edu/", imageUrl: "https://images.squarespace-cdn.com/content/v1/623126b50d2dfb281caaafd3/1672873159780-DMNEXJD6Q07IVOXSC4QM/Purdue-University-logo.png"} // Added Purdue
         ];
-        const shs = [ /* ... Specialized HS data remains the same ... */
+        const shs = [
             { lat: 40.878330, lng: -73.890830, name: "The Bronx High School of Science (Bx Sci)", type: "Specialized HS", homepageUrl: "https://www.bxscience.edu/", imageUrl: "https://upload.wikimedia.org/wikipedia/en/7/70/BxSci_Logo_New.jpg" },
             { lat: 40.70980037964541,  lng: -73.94438497633814, name: "The Brooklyn Latin School (Bk Latin)", type: "Specialized HS", homepageUrl: "https://www.brooklynlatin.org/", imageUrl: "https://upload.wikimedia.org/wikipedia/en/5/5b/Brooklyn_Latin_School_Logo.png" },
-            { lat: 40.688890, lng: -73.976940, name: "Brooklyn Technical High School (BTech)", type: "Specialized HS", homepageUrl: "https://www.bths.edu/", imageUrl: "https://upload.wikimedia.org/wikipedia/en/9/9b/Bthslogo.JPG" },
+            { lat: 40.688890, lng: -73.976940, name: "Brooklyn Technical High School (BTech)", person: "David", type: "Specialized HS", homepageUrl: "https://www.bths.edu/", imageUrl: "https://upload.wikimedia.org/wikipedia/en/9/9b/Bthslogo.JPG" }, // David added
             { lat: 40.774170, lng: -73.985560, name: "Fiorello H. LaGuardia High School of Music & Art and Performing Arts (LaGuardia)", type: "Specialized HS", homepageUrl: "https://www.laguardiahs.org/", imageUrl: "https://www.laguardiahs.org/favicon.ico" },
-            { lat: 40.82144918624461,  lng: -73.94897906541505, name: "High School for Mathematics, Science and Engineering at City College of New York (HSMSE)", type: "Specialized HS", homepageUrl: "https://www.hsmse.org/", imageUrl: "https://www.hsmse.org/pics/school_logo.png" },
+            { lat: 40.82144918624461,  lng: -73.94897906541505, name: "High School for Mathematics, Science and Engineering at City College of New York (HSMSE)", person: "Matthew", type: "Specialized HS", homepageUrl: "https://www.hsmse.org/", imageUrl: "https://www.hsmse.org/pics/school_logo.png" }, // Matthew added
             { lat: 40.874834, lng: -73.895187, name: "High School of American Studies at Lehman College (HSAS)", type: "Specialized HS", homepageUrl: "https://www.hsas-lehman.org/", imageUrl: "https://hsas-lehman.org/wp-content/uploads/2022/10/HSAS-Logo-600.png" },
             { lat: 40.70104158019869,  lng: -73.79834704188286, name: "Queens High School for the Sciences at York College (QHSS)", type: "Specialized HS", homepageUrl: "https://www.qhss.org/", imageUrl: "https://upload.wikimedia.org/wikipedia/en/3/37/QHSSYCLOGO.jpg" },
-            { lat: 40.567928, lng: -74.115328, name: "Staten Island Technical High School (SITHS)", type: "Specialized HS", homepageUrl: "https://www.sitechhs.com/", imageUrl: "https://cdn.sanity.io/images/7i1ps9pf/production/4bc60f90601ca06a1aa19776bb73e009363daec9-750x750.jpg" },
-            { lat: 40.717900, lng: -74.013800, name: "Stuyvesant High School (Stuy)", type: "Specialized HS", homepageUrl: "https://stuy.enschool.org/", imageUrl: "https://upload.wikimedia.org/wikipedia/en/4/49/Stuyvesant_High_School_logo.svg" }
+            { lat: 40.567928, lng: -74.115328, name: "Staten Island Technical High School (SITHS)", person: "Ashton", type: "Specialized HS", homepageUrl: "https://www.sitechhs.com/", imageUrl: "https://cdn.sanity.io/images/7i1ps9pf/production/4bc60f90601ca06a1aa19776bb73e009363daec9-750x750.jpg" }, // Ashton added
+            { lat: 40.717900, lng: -74.013800, name: "Stuyvesant High School (Stuy)", person: "Jason", type: "Specialized HS", homepageUrl: "https://stuy.enschool.org/", imageUrl: "https://upload.wikimedia.org/wikipedia/en/4/49/Stuyvesant_High_School_logo.svg" } // Jason added
         ];
-        const nest = [ /* ... NEST+m data remains the same ... */
+        const nest = [
             { lat: 40.7198, lng: -73.9792, name: "New Explorations into Science, Technology and Math (NEST+m)", person: "Norman", type: "NEST+m", homepageUrl: "https://nestmk12.net/", imageUrl: "https://lumatehealth.com/wp-content/uploads/2024/01/nest-m-school-logo.png" },
         ];
 
-        // UPDATED: Combined all data sources including the new 'otherPrivateCampuses'
+        // --- Combine all data ---
         const allData = [...sunyCampuses, ...cunyCampuses, ...ivycampuses, ...otherPrivateCampuses, ...shs, ...nest];
 
-        // NEW: Category Definitions
+        // --- Category Definitions ---
         const CATEGORY_PUBLIC = "Public Colleges & Universities";
         const CATEGORY_PRIVATE = "Private Colleges & Universities";
+        const CATEGORY_OTHER_UNIV = "Other Universities"; // Added Category for Purdue
         const CATEGORY_HIGH_SCHOOLS = "High Schools";
 
-        // UPDATED: Map types to their new top-level categories
         const typeToCategoryMap = {
             "SUNY": CATEGORY_PUBLIC,
             "CUNY": CATEGORY_PUBLIC,
             "Ivy League": CATEGORY_PRIVATE,
             [TYPE_OTHER_PRIVATE]: CATEGORY_PRIVATE,
+            "Purdue University System": CATEGORY_OTHER_UNIV, // Map Purdue's type
             "Specialized HS": CATEGORY_HIGH_SCHOOLS,
             "NEST+m": CATEGORY_HIGH_SCHOOLS
         };
 
-        // NEW: Define order within Private category for display
         const privateSubCategoryOrder = ["Ivy League", TYPE_OTHER_PRIVATE];
-        const publicSubCategoryOrder = ["SUNY", "CUNY"]; // For consistency
-        const highSchoolSubCategoryOrder = ["Specialized HS", "NEST+m"]; // For consistency
+        const publicSubCategoryOrder = ["SUNY", "CUNY"];
+        const otherUnivSubCategoryOrder = ["Purdue University System"]; // Order for Purdue's category
+        const highSchoolSubCategoryOrder = ["Specialized HS", "NEST+m"];
 
-        // UPDATED: Define the overall order of categories
-        const categoryOrder = [attendedCategoryName, CATEGORY_PUBLIC, CATEGORY_PRIVATE, CATEGORY_HIGH_SCHOOLS];
+        const categoryOrder = [attendedCategoryName, CATEGORY_PUBLIC, CATEGORY_PRIVATE, CATEGORY_OTHER_UNIV, CATEGORY_HIGH_SCHOOLS]; // Added new category
 
         // --- Global Variables ---
         let map;
         let infowindow;
         let isDarkMode = false;
-        let allMarkers = [];
-        let filterState = {};
-        let schoolsByType = {};
-        let schoolsSelectedForZoom = new Set();
+        let allMarkers = []; // Stores { marker, type, school }
+        let filterState = {}; // Stores { typeName: boolean }
+        let schoolsByType = {}; // Stores { typeName: [school, school] } including attendedCategoryName
+        let schoolsSelectedForZoom = new Set(); // Stores originalIndex of selected schools
 
         // --- Functions ---
 
-        function processSchoolData(data) { /* ... No change needed here ... */
-             const grouped = {}; const typesFound = new Set(); grouped[attendedCategoryName] = [];
+        /**
+         * Processes raw school data, groups by type and attended status.
+         * Adds 'displayName', 'originalIndex', and 'isVisible' properties.
+         * Creates the 'Attended Schools' group.
+         */
+        function processSchoolData(data) {
+             const grouped = {};
+             const typesFound = new Set();
+             grouped[attendedCategoryName] = []; // Initialize attended group
+
              data.forEach((school, index) => {
-                 const type = school.type || "Unknown"; if (type !== "Unknown") typesFound.add(type);
-                 const displayName = school.person ? `${school.name}` : school.name;
-                 const schoolEntry = { ...school, displayName: displayName, originalIndex: index, isVisible: true };
-                 // Ensure the type exists as a key in the grouped object
+                 const type = school.type || "Unknown";
+                 if (type !== "Unknown") typesFound.add(type);
+
+                 // Add extra properties for internal use
+                 const schoolEntry = {
+                     ...school,
+                     displayName: school.name, // Base display name
+                     originalIndex: index,
+                     isVisible: true // Start visible by default
+                 };
+
+                 // Add to its primary type group
                  if (!grouped[type]) grouped[type] = [];
                  grouped[type].push(schoolEntry);
-                 // Add to attended category if applicable
-                 if (school.person === "Norman") { grouped[attendedCategoryName].push(schoolEntry); }
+
+                 // Add to Attended Schools group if a person is assigned
+                 if (school.person && peopleNames.includes(school.person)) {
+                     grouped[attendedCategoryName].push(schoolEntry);
+                 }
              });
-             // Ensure all defined types exist as keys, even if empty
-             Object.keys(typeColors).forEach(type => { if (!grouped[type]) grouped[type] = []; });
-             // Sort schools within each type
-             for (const type in grouped) { grouped[type].sort((a, b) => a.displayName.localeCompare(b.displayName)); }
-             // Remove attended category if empty
-             if (grouped[attendedCategoryName].length === 0) delete grouped[attendedCategoryName];
+
+             // Ensure all defined types have an entry, even if empty
+             Object.keys(typeColors).forEach(type => {
+                 if (!grouped[type]) grouped[type] = [];
+             });
+
+             // Sort schools within each type group alphabetically
+             for (const type in grouped) {
+                 grouped[type].sort((a, b) => a.displayName.localeCompare(b.displayName));
+             }
+
+             // Remove attended group if it ended up empty (shouldn't happen with current data)
+             if (grouped[attendedCategoryName].length === 0) {
+                 delete grouped[attendedCategoryName];
+             }
+
              return grouped;
         }
 
-        function updateIndividualCheckboxesForType(typeName, isChecked) { /* ... No change ... */
-            console.log(`Setting isVisible for type: ${typeName} to state: ${isChecked}`);
-            allMarkers.forEach((markerInfo) => {
-                if (!markerInfo || !markerInfo.school) return;
-                const school = markerInfo.school;
-                const typeMatches = school.type === typeName;
-                // Special handling for the attended category - it's not a 'type' but a filter concept
-                const isAttendedMatch = typeName === attendedCategoryName && school.person === "Norman";
+        /**
+         * Updates the checked state of individual school list checkboxes based on a type filter change.
+         * Does NOT directly change marker visibility - relies on triggering checkbox 'change' event.
+         */
+        function updateIndividualCheckboxesForType(typeName, isChecked) {
+            console.log(`Setting individual checkboxes for type: ${typeName} to state: ${isChecked}`);
+            const affectedSchools = schoolsByType[typeName] || [];
 
-                if (typeMatches || isAttendedMatch) {
-                    // If the filter is for 'Attended', only affect the visibility of Norman's schools
-                    // If the filter is for a specific type (e.g., SUNY), affect all SUNY schools
-                    // This prevents unchecking 'SUNY' from hiding Norman's SUNY school if 'Attended' is checked.
-                    // Logic simplification: Let the individual checkbox handle its state directly.
-                    // The type filter only *sets* the initial/batch state. Individual can override.
-                    // We just need to update the *visual* state of the individual checkboxes here.
-
-                    const checkboxId = `school-checkbox-${school.originalIndex}`;
-                    const checkboxElement = document.getElementById(checkboxId);
-
-                    // When a *type* filter changes, update corresponding individual checkboxes *and* the school's visibility state
-                    if (typeMatches) {
-                        school.isVisible = isChecked; // Update visibility based on type filter
-                         if (checkboxElement) { checkboxElement.checked = isChecked; }
-                    }
-                    // When the 'Attended' filter changes, update only Norman's schools' checkboxes *and* their visibility
-                    else if (isAttendedMatch) {
-                         school.isVisible = isChecked; // Update visibility based on attended filter
-                         if (checkboxElement) { checkboxElement.checked = isChecked; }
-                    }
-                }
+            affectedSchools.forEach((school) => {
+                 const checkboxId = `school-checkbox-${school.originalIndex}`;
+                 const checkboxElement = document.getElementById(checkboxId);
+                 if (checkboxElement && checkboxElement.checked !== isChecked) {
+                     checkboxElement.checked = isChecked;
+                     // Manually trigger the change event to update visibility and indeterminate states
+                     checkboxElement.dispatchEvent(new Event('change', { bubbles: true }));
+                 }
             });
-            // Recalculate marker visibility after potential state changes
-            // updateMarkersVisibility(); // Let the calling function handle this after all types are processed
+            // Note: We no longer call updateMarkersVisibility or filterSchoolList here directly.
+            // The individual checkbox change handlers take care of that.
         }
 
-
-        function updateMarkersVisibility() { /* ... No change ... */
+        /**
+         * Updates the visibility of all markers based on their school.isVisible state.
+         */
+        function updateMarkersVisibility() {
             console.log("Updating marker visibility based on school.isVisible state.");
             let visibleCount = 0;
             allMarkers.forEach((markerInfo) => {
                 if (!markerInfo || !markerInfo.marker || !markerInfo.school) return;
-                const isVisible = markerInfo.school.isVisible; // Read directly from school object
-                markerInfo.marker.setVisible(!!isVisible);
-                 if (isVisible) visibleCount++;
+                const isVisible = markerInfo.school.isVisible;
+                // Ensure marker visibility reflects the state
+                if (markerInfo.marker.getVisible() !== isVisible) {
+                     markerInfo.marker.setVisible(!!isVisible);
+                }
+                if (isVisible) visibleCount++;
             });
             console.log(`${visibleCount} markers are now visible.`);
+             // After updating markers, filter the list to match
+             filterSchoolList();
         }
 
-
-        function filterSchoolList() { /* ... Existing code ... */
+        /**
+         * Filters the school list based on the search input text.
+         */
+        function filterSchoolList() {
             console.log("Filtering list items based on search term.");
             const searchTerm = document.getElementById('schoolSearchInput').value.toLowerCase().trim();
             const schoolListContainer = document.getElementById('school-list-control');
@@ -401,7 +471,7 @@
             const categoryHeadings = schoolListContainer.querySelectorAll('h5.list-category-header, h5.attended-category-header');
             const typeSubHeadings = schoolListContainer.querySelectorAll('h6.type-subheader');
 
-            // Filter individual list items
+             // Step 1: Filter individual list items based on search term
             listItems.forEach(item => {
                 const nameSpan = item.querySelector('span.school-name');
                 if (nameSpan) {
@@ -413,49 +483,43 @@
                 }
             });
 
-            // Hide/show type sub-headings based on visible children
+             // Step 2: Hide/Show Type Subheadings based on visible items within their UL
             typeSubHeadings.forEach(subHeading => {
                 const list = subHeading.nextElementSibling;
                 let subCategoryHasVisibleItem = false;
                 if (list && list.tagName === 'UL') {
                     const itemsInList = list.querySelectorAll('li');
                     for (let i = 0; i < itemsInList.length; i++) {
-                        // Check the *computed* style in case it was hidden by search
+                        // Check the *computed* display style in case it was hidden by search
                         if (itemsInList[i].style.display !== 'none') {
                             subCategoryHasVisibleItem = true;
                             break;
                         }
                     }
                 }
-                 // Also check if the list itself is hidden (e.g. if the whole category is filtered out)
-                 if (list && list.style.display === 'none') subCategoryHasVisibleItem = false;
-
                 subHeading.style.display = subCategoryHasVisibleItem ? 'block' : 'none';
             });
 
-            // Hide/show main category headings based on visible children/sub-headings
+             // Step 3: Hide/Show Category Headings based on visible subheadings or list items
             categoryHeadings.forEach(heading => {
                 let nextElement = heading.nextElementSibling;
                 let categoryHasVisibleContent = false;
                 while (nextElement && !nextElement.classList.contains('list-category-header') && !nextElement.classList.contains('attended-category-header')) {
-                    // Check if the element itself is visible AND if it's a subheader that's visible OR a list with visible items
+                    // Check if the element itself is visible (either a subheading or a UL)
                     if (nextElement.style.display !== 'none') {
-                         // Visible subheader?
-                         if (nextElement.tagName === 'H6' && nextElement.style.display !== 'none') {
-                              categoryHasVisibleContent = true;
-                              break;
-                         }
-                         // Visible list with visible items?
-                         if (nextElement.tagName === 'UL' && nextElement.style.display !== 'none') {
-                              const itemsInList = nextElement.querySelectorAll('li');
-                               for (let i = 0; i < itemsInList.length; i++) {
-                                   if (itemsInList[i].style.display !== 'none') {
-                                        categoryHasVisibleContent = true;
-                                        break; // Break inner loop
-                                   }
-                               }
-                               if (categoryHasVisibleContent) break; // Break outer loop
-                         }
+                         // If it's a UL, double-check it has visible list items inside (already filtered)
+                        if (nextElement.tagName === 'UL') {
+                            const itemsInList = nextElement.querySelectorAll('li');
+                            for (let i = 0; i < itemsInList.length; i++) {
+                                if (itemsInList[i].style.display !== 'none') {
+                                    categoryHasVisibleContent = true;
+                                    break;
+                                }
+                            }
+                        } else if (nextElement.tagName === 'H6') { // Visible subheading is enough
+                             categoryHasVisibleContent = true;
+                        }
+                        if (categoryHasVisibleContent) break; // Found visible content, stop checking for this category
                     }
                     nextElement = nextElement.nextElementSibling;
                 }
@@ -463,99 +527,263 @@
             });
         }
 
+        /**
+         * Handles clicks on list items (not the checkbox itself).
+         * Pans map, opens info window, or opens homepage on Ctrl/Cmd+Click.
+         */
+        function handleListItemClick(event, markerIndex) {
+             // Ignore clicks directly on the checkbox
+             if (event.target.type === 'checkbox') {
+                 return;
+             }
 
-        function handleListItemClick(event, markerIndex) { /* ... No change ... */
-             if (event.target.type === 'checkbox') { return; }
-             if (markerIndex === undefined || markerIndex < 0 || markerIndex >= allMarkers.length || !allMarkers[markerIndex]) { console.error("Invalid marker index for list item click:", markerIndex); return; }
-             const markerInfo = allMarkers[markerIndex]; const schoolData = markerInfo.school;
-             if (event.ctrlKey || event.metaKey) { if (schoolData.homepageUrl) { window.open(schoolData.homepageUrl, '_blank'); } else { console.warn("Ctrl+Click attempted, but no homepage URL for:", schoolData.name); } }
+             if (markerIndex === undefined || markerIndex < 0 || markerIndex >= allMarkers.length || !allMarkers[markerIndex]) {
+                 console.error("Invalid marker index for list item click:", markerIndex);
+                 return;
+             }
+
+             const markerInfo = allMarkers[markerIndex];
+             const schoolData = markerInfo.school;
+
+             // Ctrl+Click or Cmd+Click opens homepage
+             if (event.ctrlKey || event.metaKey) {
+                 if (schoolData.homepageUrl) {
+                     window.open(schoolData.homepageUrl, '_blank');
+                 } else {
+                     console.warn("Ctrl+Click attempted, but no homepage URL for:", schoolData.name);
+                 }
+             }
+             // Regular click pans and shows info window
              else {
-                 const position = markerInfo.marker.getPosition(); map.panTo(position); map.setZoom(15);
+                 const position = markerInfo.marker.getPosition();
+                 map.panTo(position);
+                 map.setZoom(15); // Consider adjusting zoom level based on context if needed
+
                  let contentString = `<div class="info-window-content">`;
-                 const targetUrl = schoolData.homepageUrl || '#'; const openInNewTab = schoolData.homepageUrl ? 'target="_blank"' : '';
-                 if (schoolData.imageUrl && schoolData.imageUrl !== 'x') contentString += `<a href="${targetUrl}" ${openInNewTab}><img src="${schoolData.imageUrl}" alt="${schoolData.name} logo/photo"></a>`;
-                 if (schoolData.homepageUrl) contentString += `<a href="${targetUrl}" ${openInNewTab}><b>${schoolData.name}</b></a>`; else contentString += `<b>${schoolData.name}</b>`;
+                 const targetUrl = schoolData.homepageUrl || '#';
+                 const openInNewTab = schoolData.homepageUrl ? 'target="_blank"' : '';
+
+                 // Image
+                 if (schoolData.imageUrl && schoolData.imageUrl !== 'x') {
+                     contentString += `<a href="${targetUrl}" ${openInNewTab}><img src="${schoolData.imageUrl}" alt="${schoolData.name} logo/photo"></a>`;
+                 }
+                 // Name (linked if URL exists)
+                 if (schoolData.homepageUrl) {
+                     contentString += `<a href="${targetUrl}" ${openInNewTab}><b>${schoolData.displayName}</b></a>`;
+                 } else {
+                     contentString += `<b>${schoolData.displayName}</b>`;
+                 }
+                 // Type
                  contentString += `<br><span class="info-window-type">Type: ${schoolData.type}</span>`;
-                 if(schoolData.person) contentString += `<br><span class="info-window-person">Attended by: ${schoolData.person}</span>`;
+                 // Person (if applicable, with specific color)
+                 if(schoolData.person && personColors[schoolData.person]) {
+                     const personColor = personColors[schoolData.person];
+                     contentString += `<br><span class="info-window-person" style="color: ${personColor};">Attended by: ${schoolData.person}</span>`;
+                 }
                  contentString += `</div>`;
-                 infowindow.setContent(contentString); infowindow.open(map, markerInfo.marker);
+
+                 infowindow.setContent(contentString);
+                 infowindow.open(map, markerInfo.marker);
              }
          }
 
-        function zoomToSelectedSchools() { /* ... No change ... */
+        /**
+         * Zooms the map to fit all schools currently selected via Shift+Click.
+         */
+        function zoomToSelectedSchools() {
             console.log("zoomToSelectedSchools called.");
             if (!google || !map) { console.log("Google Maps API or map object not ready."); return; }
+
             console.log(`Current schoolsSelectedForZoom size: ${schoolsSelectedForZoom.size}`);
             console.log(`Selected indices: ${[...schoolsSelectedForZoom].join(', ')}`);
-            if (schoolsSelectedForZoom.size === 0) { console.log("No schools selected for zoom."); return; }
-            const bounds = new google.maps.LatLngBounds(); let validPoints = 0;
+
+            if (schoolsSelectedForZoom.size === 0) {
+                console.log("No schools selected for zoom.");
+                // Optionally reset zoom or do nothing
+                // map.setCenter({ lat: 41.8, lng: -74.5 }); map.setZoom(7);
+                return;
+            }
+
+            const bounds = new google.maps.LatLngBounds();
+            let validPoints = 0;
             schoolsSelectedForZoom.forEach(index => {
                 const markerInfo = allMarkers[index];
-                if (markerInfo && markerInfo.marker) { const pos = markerInfo.marker.getPosition(); console.log(`Extending bounds with index ${index} at ${pos}`); bounds.extend(pos); validPoints++; } else { console.log(`Skipping index ${index} - markerInfo or marker not found.`); }
+                // Only include if the marker exists and is *currently visible*
+                if (markerInfo && markerInfo.marker && markerInfo.school && markerInfo.school.isVisible) {
+                    const pos = markerInfo.marker.getPosition();
+                    console.log(`Extending bounds with visible index ${index} at ${pos}`);
+                    bounds.extend(pos);
+                    validPoints++;
+                } else {
+                    console.log(`Skipping index ${index} - marker/school not found or not visible.`);
+                }
             });
-            if (validPoints > 0) { console.log(`Calling map.fitBounds for ${validPoints} point(s).`); map.fitBounds(bounds, 50); } else { console.log("No valid marker positions found to fit bounds."); }
+
+            if (validPoints > 0) {
+                console.log(`Calling map.fitBounds for ${validPoints} visible point(s).`);
+                map.fitBounds(bounds); // Let Maps API decide padding
+
+                // If only one point, zoom in closer after fitting bounds
+                if (validPoints === 1) {
+                   // map.setZoom(15); // Adjust zoom level as desired for single point
+                    // Use a listener to set zoom after bounds change if fitBounds zoom is too far out
+                    google.maps.event.addListenerOnce(map, 'idle', function() {
+                       if (map.getZoom() > 15) map.setZoom(15);
+                    });
+                }
+            } else {
+                console.log("No valid *visible* marker positions found to fit bounds.");
+                // Optionally reset zoom here too
+            }
         }
 
+        /**
+         * Updates the indeterminate state of a type filter checkbox based on its children.
+         */
+         function updateParentFilterState(typeName) {
+             const typeFilterCheckbox = document.getElementById(`filter-${typeName.replace(/\W+/g, '-')}`);
+             if (!typeFilterCheckbox) return;
+
+             const childSchools = schoolsByType[typeName] || [];
+             if (childSchools.length === 0) {
+                 typeFilterCheckbox.checked = false;
+                 typeFilterCheckbox.indeterminate = false;
+                 return;
+             }
+
+             let allChecked = true;
+             let noneChecked = true;
+
+             for (const school of childSchools) {
+                 const schoolCheckbox = document.getElementById(`school-checkbox-${school.originalIndex}`);
+                 if (schoolCheckbox) {
+                     if (schoolCheckbox.checked) {
+                         noneChecked = false;
+                     } else {
+                         allChecked = false;
+                     }
+                 } else {
+                      // If a checkbox is missing, we can't determine state accurately
+                      // For safety, maybe assume it breaks 'allChecked'
+                      allChecked = false;
+                      console.warn(`Missing school checkbox for ${school.displayName} when updating parent filter ${typeName}`);
+                 }
+                 // Optimization: if we know it's neither all nor none, we can stop checking
+                 if (!allChecked && !noneChecked) break;
+             }
+
+
+             if (allChecked) {
+                 typeFilterCheckbox.checked = true;
+                 typeFilterCheckbox.indeterminate = false;
+             } else if (noneChecked) {
+                 typeFilterCheckbox.checked = false;
+                 typeFilterCheckbox.indeterminate = false;
+             } else {
+                 typeFilterCheckbox.checked = false; // Set to false when indeterminate for clearer UI
+                 typeFilterCheckbox.indeterminate = true;
+             }
+         }
+
+
+        /**
+         * Initializes the map, processes data, creates UI elements, and sets up event listeners.
+         */
         function initMap() {
             console.log("Initializing map...");
             schoolsByType = processSchoolData(allData);
-            filterState = {};
-            // Initialize filter state for all known types + the attended category
-            Object.keys(schoolsByType).forEach(type => filterState[type] = true);
-            // Note: schoolsByType[attendedCategoryName] might be undefined if Norman attended no schools
-            if (schoolsByType[attendedCategoryName]) {
-                 filterState[attendedCategoryName] = true;
-            } else {
-                 // Ensure the key exists even if empty, consistent with processSchoolData
-                 if (!schoolsByType[attendedCategoryName]) schoolsByType[attendedCategoryName] = [];
-                 filterState[attendedCategoryName] = true; // Default to true, but filter UI won't show if list is empty
-            }
 
-            const mapOptions = { center: { lat: 41.8, lng: -74.5 }, zoom: 7, mapTypeControlOptions: { position: google.maps.ControlPosition.TOP_RIGHT }, styles: null, fullscreenControl: true, streetViewControl: true, zoomControl: true, mapTypeControl: true, gestureHandling: 'greedy' };
+            // Initialize filter state based on processed types
+            filterState = {};
+            Object.keys(schoolsByType).forEach(type => {
+                // Start with all filters checked
+                 filterState[type] = true;
+                 // Ensure all schools start visible matching the filter state
+                 if (schoolsByType[type]) {
+                     schoolsByType[type].forEach(s => s.isVisible = true);
+                 }
+            });
+
+            // Ensure Attended category exists in filter state
+             if (!filterState[attendedCategoryName]) {
+                  filterState[attendedCategoryName] = true;
+                  // Update isVisible for attended schools if needed (should be covered above)
+                  if (schoolsByType[attendedCategoryName]) {
+                       schoolsByType[attendedCategoryName].forEach(s => s.isVisible = true);
+                  }
+             }
+
+
+            const mapOptions = {
+                center: { lat: 41.8, lng: -74.5 }, // Adjust center/zoom if needed
+                zoom: 7,
+                mapTypeControlOptions: { position: google.maps.ControlPosition.TOP_RIGHT },
+                styles: null, // Start with default style
+                fullscreenControl: true,
+                streetViewControl: true,
+                zoomControl: true,
+                mapTypeControl: true,
+                gestureHandling: 'greedy' // Allows better map interaction
+            };
             map = new google.maps.Map(document.getElementById("map"), mapOptions);
             infowindow = new google.maps.InfoWindow();
-            schoolsSelectedForZoom = new Set();
+            schoolsSelectedForZoom = new Set(); // Reset selected set
 
+            // --- Get Control Containers ---
             const filterControlDiv = document.getElementById('filter-control');
             const schoolListDiv = document.getElementById('school-list-control');
             const darkModeToggle = document.getElementById('darkModeToggle');
             const schoolSearchInput = document.getElementById('schoolSearchInput');
-            const listHeaderContainer = schoolListDiv.querySelector('.list-header-container'); // Grab before clearing
+            const listHeaderContainer = schoolListDiv.querySelector('.list-header-container'); // Keep header
             const checkAllBtn = document.getElementById('checkAllTypesBtn');
             const uncheckAllBtn = document.getElementById('uncheckAllTypesBtn');
 
-            // Clear existing content but keep headers/buttons
+            // --- Clear Existing Dynamic Content ---
+            // Clear filters but keep H4 and buttons
             const filterTitle = filterControlDiv.querySelector('h4');
             const filterButtons = filterControlDiv.querySelector('.filter-control-buttons');
             filterControlDiv.innerHTML = ''; // Clear
-            filterControlDiv.appendChild(filterTitle); // Re-add
-            filterControlDiv.appendChild(filterButtons); // Re-add
-            filterControlDiv.appendChild(document.createElement('div')).style.clear = 'both'; // Re-add clearfix
+            filterControlDiv.appendChild(filterTitle);
+            filterControlDiv.appendChild(filterButtons);
+            filterControlDiv.appendChild(document.createElement('div')).style.clear = 'both'; // Clear float
 
-            schoolListDiv.innerHTML = listHeaderContainer.outerHTML; // Clear list area, keep header/search
+            // Clear school list but keep header and search
+            schoolListDiv.innerHTML = ''; // Clear everything
+            schoolListDiv.appendChild(listHeaderContainer); // Add header back
 
+
+            // --- Populate Type Filter Controls ---
             console.log("Populating type filter controls...");
             const fragmentFilters = document.createDocumentFragment();
-            // --- UPDATED: Type Filter Population with Categories ---
+
+             // Iterate through categories in the defined order
              categoryOrder.forEach(categoryName => {
                  const isAttendedCategory = categoryName === attendedCategoryName;
                  let typesToProcess = [];
 
+                 // Determine which types belong to this category
                  if (isAttendedCategory) {
-                     // Only process attended if there are schools in it
+                     // Only add the attended category if it has schools
                      if (schoolsByType[attendedCategoryName] && schoolsByType[attendedCategoryName].length > 0) {
                          typesToProcess = [attendedCategoryName];
                      }
-                 } else {
-                     // Get all types belonging to the current category from the map
-                     typesToProcess = Object.keys(schoolsByType).filter(type => typeToCategoryMap[type] === categoryName && type !== attendedCategoryName);
-                     // Optionally sort types within the category if needed (e.g., alphabetically)
-                     typesToProcess.sort((a, b) => a.localeCompare(b));
+                 } else if (categoryName === CATEGORY_PUBLIC) {
+                     typesToProcess = publicSubCategoryOrder.filter(type => schoolsByType[type] && schoolsByType[type].length > 0);
+                 } else if (categoryName === CATEGORY_PRIVATE) {
+                     typesToProcess = privateSubCategoryOrder.filter(type => schoolsByType[type] && schoolsByType[type].length > 0);
+                 } else if (categoryName === CATEGORY_OTHER_UNIV) {
+                     typesToProcess = otherUnivSubCategoryOrder.filter(type => schoolsByType[type] && schoolsByType[type].length > 0);
+                 } else if (categoryName === CATEGORY_HIGH_SCHOOLS) {
+                     typesToProcess = highSchoolSubCategoryOrder.filter(type => schoolsByType[type] && schoolsByType[type].length > 0);
                  }
+                 // Fallback for any types not categorized explicitly (shouldn't happen with current setup)
+                 // else { typesToProcess = Object.keys(schoolsByType).filter(type => !categoryOrder.includes(typeToCategoryMap[type] || '') && type !== attendedCategoryName); }
 
-                 // Only add category header if there are types to process within it
+
+                 // If types exist for this category, create header and checkboxes
                  if (typesToProcess.length > 0) {
-                      // Add the main category header (H5) for non-attended categories
+
+                      // Add category header (unless it's the special attended category)
                       if (!isAttendedCategory) {
                            const categoryHeader = document.createElement('h5');
                            categoryHeader.className = 'category-header';
@@ -563,12 +791,11 @@
                            fragmentFilters.appendChild(categoryHeader);
                       }
 
-                      // Loop through the specific types (or the single 'attended' category type)
+                      // Add filter items for each type within the category
                       typesToProcess.forEach(typeName => {
-                          // Check again if this specific type has schools (redundant but safe)
-                          if (!schoolsByType[typeName] || schoolsByType[typeName].length === 0) return;
+                          if (!schoolsByType[typeName] || schoolsByType[typeName].length === 0) return; // Skip empty types
 
-                          const filterId = `filter-${typeName.replace(/\W+/g, '-')}`;
+                          const filterId = `filter-${typeName.replace(/\W+/g, '-')}`; // Sanitize ID
                           const itemDiv = document.createElement('div');
                           itemDiv.className = 'filter-item';
 
@@ -576,23 +803,36 @@
                           checkbox.type = 'checkbox';
                           checkbox.id = filterId;
                           checkbox.value = typeName;
-                          checkbox.checked = filterState[typeName] !== undefined ? filterState[typeName] : true; // Default checked
+                          // Initial checked state from filterState
+                          checkbox.checked = filterState[typeName] !== undefined ? filterState[typeName] : true;
 
+                          // Type Filter Change Listener
                           checkbox.addEventListener('change', (event) => {
                               const isChecked = event.target.checked;
-                              filterState[typeName] = isChecked;
-                              updateIndividualCheckboxesForType(typeName, isChecked); // Update visibility state of schools
-                              updateMarkersVisibility(); // Update map based on new states
-                              filterSchoolList(); // Apply search filter again as visibility changed
+                              filterState[typeName] = isChecked; // Update global state
+                              console.log(`Filter Change: ${typeName}, Checked: ${isChecked}, Indeterminate: ${event.target.indeterminate}`);
+
+                               // If the click was not to set indeterminate, update children
+                              if (!event.target.indeterminate) {
+                                 updateIndividualCheckboxesForType(typeName, isChecked);
+                              } else {
+                                 // If it became indeterminate, state is mixed, don't force children
+                                 console.log(`Filter ${typeName} is now indeterminate, not changing children.`);
+                              }
+                              // No need to call updateMarkersVisibility or filterSchoolList here,
+                              // individual checkbox handlers do that.
                           });
 
                           const label = document.createElement('label');
                           label.htmlFor = filterId;
                           const colorBox = document.createElement('span');
-                          // Use person color for attended, type color otherwise
-                          const isPersonType = typeName === attendedCategoryName;
-                          colorBox.className = 'filter-color-box' + (isPersonType ? ' person-filter' : '');
-                          colorBox.style.backgroundColor = isPersonType ? personColors["Norman"] : (typeColors[typeName] || '#cccccc');
+
+                           // Special styling for the attended filter checkbox
+                          const isPersonFilterType = typeName === attendedCategoryName;
+                          colorBox.className = 'filter-color-box' + (isPersonFilterType ? ' person-filter' : ''); // Adds border/bg style via CSS
+                          if (!isPersonFilterType) {
+                              colorBox.style.backgroundColor = typeColors[typeName] || '#cccccc'; // Normal type color
+                          }
 
                           label.appendChild(colorBox);
                           label.appendChild(document.createTextNode(` ${typeName} (${schoolsByType[typeName].length})`));
@@ -603,269 +843,391 @@
                       });
                  }
              });
-            filterControlDiv.appendChild(fragmentFilters);
+            filterControlDiv.appendChild(fragmentFilters); // Add all filters to the DOM
 
-
-             // --- Add Tip Message ---
-             if (listHeaderContainer && !document.getElementById('schoolListTip')) { /* ... Tip unchanged ... */
-                 const tipDiv = document.createElement('div'); tipDiv.id = 'schoolListTip'; tipDiv.className = 'tip-message'; const tipText = document.createElement('span');
+            // --- Add Tip Message ---
+            if (listHeaderContainer && !document.getElementById('schoolListTip')) {
+                 const tipDiv = document.createElement('div');
+                 tipDiv.id = 'schoolListTip';
+                 tipDiv.className = 'tip-message';
+                 const tipText = document.createElement('span');
                  tipText.innerHTML = 'Tips: <br>• Use checkboxes to toggle school visibility.<br>• <b>Shift + Click</b> checkbox to add/remove school from group zoom.<br>• <b>CTRL + Click name</b> (or CMD + Click) to open homepage.';
-                 const dismissBtn = document.createElement('span'); dismissBtn.id = 'dismissTipBtn'; dismissBtn.className = 'dismiss-button'; dismissBtn.textContent = 'x'; dismissBtn.title = 'Dismiss this tip'; dismissBtn.setAttribute('role', 'button'); dismissBtn.setAttribute('tabindex', '0');
-                 dismissBtn.addEventListener('click', () => { tipDiv.style.display = 'none'; }); dismissBtn.addEventListener('keydown', (e) => { if (e.key === 'Enter' || e.key === ' ') { dismissBtn.click(); } });
-                 tipDiv.appendChild(tipText); tipDiv.appendChild(dismissBtn); listHeaderContainer.insertAdjacentElement('afterend', tipDiv);
+                 const dismissBtn = document.createElement('span');
+                 dismissBtn.id = 'dismissTipBtn';
+                 dismissBtn.className = 'dismiss-button';
+                 dismissBtn.textContent = 'x';
+                 dismissBtn.title = 'Dismiss this tip';
+                 dismissBtn.setAttribute('role', 'button');
+                 dismissBtn.setAttribute('tabindex', '0');
+                 dismissBtn.addEventListener('click', () => { tipDiv.style.display = 'none'; });
+                 dismissBtn.addEventListener('keydown', (e) => { if (e.key === 'Enter' || e.key === ' ') { dismissBtn.click(); } });
+                 tipDiv.appendChild(tipText);
+                 tipDiv.appendChild(dismissBtn);
+                 listHeaderContainer.insertAdjacentElement('afterend', tipDiv); // Add after the header
              }
 
+            // --- Populate School List with Individual Checkboxes ---
             console.log("Populating school list with individual checkboxes...");
             const fragmentList = document.createDocumentFragment();
-            // --- UPDATED: School List Population with Hierarchy ---
-             categoryOrder.forEach(categoryName => {
+
+            // Use the same category order for the list
+            categoryOrder.forEach(categoryName => {
                  const isAttendedCategory = categoryName === attendedCategoryName;
                  let typesInThisCategory = [];
 
-                 // Determine which types/sub-categories belong here
+                 // Determine types for this category (same logic as filters)
                  if (isAttendedCategory) {
-                     if (schoolsByType[attendedCategoryName] && schoolsByType[attendedCategoryName].length > 0) {
-                         typesInThisCategory = [attendedCategoryName]; // Special case
-                     }
+                      if (schoolsByType[attendedCategoryName] && schoolsByType[attendedCategoryName].length > 0) {
+                          typesInThisCategory = [attendedCategoryName];
+                      }
                  } else if (categoryName === CATEGORY_PUBLIC) {
                       typesInThisCategory = publicSubCategoryOrder.filter(type => schoolsByType[type] && schoolsByType[type].length > 0);
                  } else if (categoryName === CATEGORY_PRIVATE) {
                       typesInThisCategory = privateSubCategoryOrder.filter(type => schoolsByType[type] && schoolsByType[type].length > 0);
+                 } else if (categoryName === CATEGORY_OTHER_UNIV) {
+                      typesInThisCategory = otherUnivSubCategoryOrder.filter(type => schoolsByType[type] && schoolsByType[type].length > 0);
                  } else if (categoryName === CATEGORY_HIGH_SCHOOLS) {
                      typesInThisCategory = highSchoolSubCategoryOrder.filter(type => schoolsByType[type] && schoolsByType[type].length > 0);
                  }
+                 // else { typesInThisCategory = Object.keys(schoolsByType).filter(type => !categoryOrder.includes(typeToCategoryMap[type] || '') && type !== attendedCategoryName); }
 
-                 // Only add the category if it contains any types with schools
+
                  if (typesInThisCategory.length > 0) {
+                     // Add Category Header
                      const categoryHeading = document.createElement('h5');
                      categoryHeading.className = 'list-category-header' + (isAttendedCategory ? ' attended-category-header' : '');
                      categoryHeading.textContent = categoryName;
                      fragmentList.appendChild(categoryHeading);
 
-                     // Now loop through the types/sub-categories within this main category
+                     // Process each type within the category
                      typesInThisCategory.forEach(typeName => {
-                          // Add a sub-header (h6) for specific types, except for the Attended category itself
+
+                          // Add Type Subheader (unless it's the main Attended category list)
                           if (!isAttendedCategory) {
                                const typeSubHeader = document.createElement('h6');
                                typeSubHeader.className = 'type-subheader';
-                               typeSubHeader.textContent = typeName; // e.g., "SUNY", "Ivy League", "Other Private"
+                               typeSubHeader.textContent = typeName;
                                fragmentList.appendChild(typeSubHeader);
                           }
 
-                          // Create the list (ul) for this type/sub-category
+                          // Create UL for this type
                           const list = document.createElement('ul');
                           schoolsByType[typeName].forEach(school => {
-                              // Prevent double listing Norman's schools if they are also listed under their type
-                              if (isAttendedCategory || school.person !== "Norman" || !schoolsByType[attendedCategoryName].some(attSch => attSch.originalIndex === school.originalIndex)) {
-                                  const listItem = document.createElement('li');
-                                  const markerIndex = school.originalIndex;
-                                  listItem.setAttribute('data-marker-index', markerIndex);
-                                  listItem.setAttribute('title', 'Click name: Zoom | Ctrl+Click name: Homepage | Shift+Click checkbox: Group Zoom');
 
-                                  // Highlight if attended by Norman, regardless of the category it's listed under
-                                  if (school.person === "Norman") {
-                                      listItem.classList.add('attended-by-person');
-                                  }
+                              // Avoid duplicating entries if a school is listed under 'Attended' and its own type.
+                              // Only render the item under its primary type unless we are *in* the Attended category list itself.
+                              // OR if the school *only* exists in the attended list (unlikely with current logic).
+                               if (!isAttendedCategory && school.person && schoolsByType[attendedCategoryName].some(attSch => attSch.originalIndex === school.originalIndex)) {
+                                   // This school is attended and will be listed under "Attended Schools", so skip rendering it here under its primary type.
+                                   // return;
+                                    // Correction: Let's list schools under BOTH their type AND the attended list.
+                                    // The filtering logic will handle duplicates if necessary, but showing context is good.
+                                    // No 'return' needed here.
+                               }
 
-                                  const schoolCheckbox = document.createElement('input');
-                                  schoolCheckbox.type = 'checkbox';
-                                  schoolCheckbox.checked = school.isVisible; // Reflect initial state
-                                  schoolCheckbox.id = `school-checkbox-${markerIndex}`;
-                                  schoolCheckbox.setAttribute('aria-label', `Toggle visibility for ${school.displayName}`);
+                               // Create List Item
+                               const listItem = document.createElement('li');
+                               const markerIndex = school.originalIndex;
+                               listItem.setAttribute('data-marker-index', markerIndex);
+                               listItem.setAttribute('title', 'Click name: Zoom | Ctrl+Click name: Homepage | Shift+Click checkbox: Group Zoom');
 
-                                  // Individual Checkbox Listener
-                                  schoolCheckbox.addEventListener('change', (event) => {
-                                      const isChecked = event.target.checked;
-                                      // Update this specific school's visibility state
-                                      if (allMarkers[markerIndex] && allMarkers[markerIndex].school) {
-                                          allMarkers[markerIndex].school.isVisible = isChecked;
-                                          updateMarkersVisibility(); // Update map based on this single change
-                                          filterSchoolList(); // Apply search filter again as visibility changed
-                                      } else {
-                                           console.warn(`Could not find school data for index ${markerIndex} on checkbox change.`);
-                                      }
+                               if (school.person) {
+                                   listItem.classList.add('attended-by-person');
+                                   // Maybe add a class specific to the person for more styling options?
+                                   // listItem.classList.add(`person-${school.person.toLowerCase()}`);
+                               }
 
-                                      // Handle Shift+Click for zooming
-                                      if (event.shiftKey) {
-                                          event.preventDefault(); // Prevent potential browser default actions
-                                          console.log(`Shift+Click detected on checkbox for index ${markerIndex}, checked=${isChecked}`);
-                                          if (isChecked && allMarkers[markerIndex] && allMarkers[markerIndex].school.isVisible) { // Only add if visible
-                                               schoolsSelectedForZoom.add(markerIndex);
-                                           } else {
-                                               schoolsSelectedForZoom.delete(markerIndex);
-                                           }
-                                          zoomToSelectedSchools(); // Attempt zoom
-                                      } else {
-                                          // If not shift-clicking, ensure it's removed from zoom selection if unchecked
-                                          if (!isChecked) {
-                                              schoolsSelectedForZoom.delete(markerIndex);
-                                          }
-                                      }
+                               // Create Checkbox for individual visibility
+                               const schoolCheckbox = document.createElement('input');
+                               schoolCheckbox.type = 'checkbox';
+                               schoolCheckbox.checked = school.isVisible; // Reflects initial state
+                               schoolCheckbox.id = `school-checkbox-${markerIndex}`;
+                               schoolCheckbox.setAttribute('aria-label', `Toggle visibility for ${school.displayName}`);
 
-                                      // Update the corresponding TYPE filter checkbox state if needed (e.g., if all individuals are unchecked)
-                                      const typeFilterCheckbox = document.getElementById(`filter-${school.type.replace(/\W+/g, '-')}`);
-                                      if (typeFilterCheckbox) {
-                                           const allOfType = schoolsByType[school.type];
-                                           const allChecked = allOfType.every(s => s.isVisible);
-                                           const noneChecked = allOfType.every(s => !s.isVisible);
-                                           if (allChecked) {
-                                                typeFilterCheckbox.checked = true;
-                                                typeFilterCheckbox.indeterminate = false;
-                                           } else if (noneChecked) {
-                                                typeFilterCheckbox.checked = false;
-                                                typeFilterCheckbox.indeterminate = false;
-                                           } else {
-                                                typeFilterCheckbox.indeterminate = true; // Some checked, some not
-                                           }
-                                      }
-                                        // Update the ATTENDED filter checkbox state if needed
-                                        if (school.person === "Norman") {
-                                            const attendedFilterCheckbox = document.getElementById(`filter-${attendedCategoryName.replace(/\W+/g, '-')}`);
-                                            if (attendedFilterCheckbox) {
-                                                const allAttended = schoolsByType[attendedCategoryName];
-                                                const allAttendedChecked = allAttended.every(s => s.isVisible);
-                                                const noneAttendedChecked = allAttended.every(s => !s.isVisible);
-                                                if (allAttendedChecked) {
-                                                    attendedFilterCheckbox.checked = true;
-                                                    attendedFilterCheckbox.indeterminate = false;
-                                                } else if (noneAttendedChecked) {
-                                                    attendedFilterCheckbox.checked = false;
-                                                    attendedFilterCheckbox.indeterminate = false;
-                                                } else {
-                                                    attendedFilterCheckbox.indeterminate = true;
-                                                }
-                                            }
+                               // Individual School Checkbox Change Listener
+                               schoolCheckbox.addEventListener('change', (event) => {
+                                   const isChecked = event.target.checked;
+                                   console.log(`School Checkbox Change: Index ${markerIndex} (${school.displayName}), Checked: ${isChecked}, Shift: ${event.shiftKey}`);
+
+                                   // 1. Update the school's visibility state
+                                   if (allMarkers[markerIndex] && allMarkers[markerIndex].school) {
+                                       allMarkers[markerIndex].school.isVisible = isChecked;
+                                   } else {
+                                       console.warn(`Could not find school data for index ${markerIndex} on checkbox change.`);
+                                       return; // Cannot proceed without school data
+                                   }
+
+                                   // 2. Update the corresponding marker's visibility
+                                   if (allMarkers[markerIndex] && allMarkers[markerIndex].marker) {
+                                       allMarkers[markerIndex].marker.setVisible(isChecked);
+                                   }
+
+                                    // 3. Update the list visibility via filterSchoolList
+                                    // This is important if the search term should hide/show items based on visibility state change, although typically search is independent.
+                                    // Let's call it to ensure consistency.
+                                    filterSchoolList();
+
+
+                                   // 4. Handle Shift+Click for group zoom
+                                   if (event.shiftKey) {
+                                       event.preventDefault(); // Prevent potential text selection
+                                       console.log(`Shift+Click detected on checkbox for index ${markerIndex}, checked=${isChecked}`);
+                                       if (isChecked && allMarkers[markerIndex].school.isVisible) { // Only add if checked *and* visible
+                                            schoolsSelectedForZoom.add(markerIndex);
+                                            console.log("Added to zoom set:", schoolsSelectedForZoom);
+                                        } else {
+                                            schoolsSelectedForZoom.delete(markerIndex);
+                                            console.log("Removed from zoom set:", schoolsSelectedForZoom);
                                         }
+                                       zoomToSelectedSchools(); // Trigger zoom immediately
+                                   } else {
+                                       // If unchecked normally, remove from zoom set
+                                       if (!isChecked) {
+                                            if(schoolsSelectedForZoom.has(markerIndex)){
+                                                schoolsSelectedForZoom.delete(markerIndex);
+                                                console.log("Removed from zoom set (normal uncheck):", schoolsSelectedForZoom);
+                                                // Optionally call zoomToSelectedSchools() here too if you want the map to readjust
+                                            }
+                                       }
+                                   }
 
+                                   // 5. Update parent type filter(s) indeterminate state
+                                    updateParentFilterState(school.type); // Update primary type filter
+                                    if (school.person) {
+                                        updateParentFilterState(attendedCategoryName); // Also update attended filter if applicable
+                                    }
 
-                                  });
+                               }); // End of schoolCheckbox listener
 
-                                  listItem.appendChild(schoolCheckbox);
-                                  const nameSpan = document.createElement('span');
-                                  nameSpan.className = 'school-name';
-                                  nameSpan.textContent = school.displayName;
-                                  listItem.appendChild(nameSpan);
-                                  listItem.addEventListener('click', (event) => handleListItemClick(event, markerIndex));
-                                  list.appendChild(listItem);
-                              }
-                          });
-                          // Only append the list if it actually contains items for this type
+                               listItem.appendChild(schoolCheckbox);
+
+                               // Create Span for School Name
+                               const nameSpan = document.createElement('span');
+                               nameSpan.className = 'school-name';
+                               nameSpan.textContent = school.displayName;
+                               // Apply person-specific color directly if attended
+                               if (school.person && personColors[school.person]) {
+                                   nameSpan.style.color = personColors[school.person];
+                                   if (isDarkMode) {
+                                       // Adjust color for dark mode if needed, maybe lighter version?
+                                       // Example: Simple brightness increase - more complex logic might be better
+                                       // For now, just use the base color, it might be readable enough
+                                   }
+                               }
+                               listItem.appendChild(nameSpan);
+
+                               // Add click listener to the LI (delegates from name span)
+                               listItem.addEventListener('click', (event) => handleListItemClick(event, markerIndex));
+
+                               list.appendChild(listItem);
+                          }); // End schoolsByType[typeName].forEach
+
+                           // Append the list only if it has items
                            if (list.hasChildNodes()) {
                                fragmentList.appendChild(list);
                            }
-                     });
-                 }
-             });
-            schoolListDiv.appendChild(fragmentList);
+                     }); // End typesInThisCategory.forEach
+                 } // End if (typesInThisCategory.length > 0)
+             }); // End categoryOrder.forEach
+            schoolListDiv.appendChild(fragmentList); // Add the complete list structure
 
-
+            // --- Create Markers ---
             console.log("Creating markers...");
-            allMarkers = new Array(allData.length);
-            // --- Marker Creation (Handles new types via typeColors map) ---
+            allMarkers = new Array(allData.length); // Initialize array
+
              allData.forEach((itemData, index) => {
-                 // Find the processed school data which includes the originalIndex
-                 let processedSchool = null;
-                 for (const type in schoolsByType) {
-                     // Check current type list and the 'attended' list
-                     const found = schoolsByType[type].find(s => s.originalIndex === index);
-                     if (found) {
-                         processedSchool = found;
-                         break;
-                     }
-                 }
+                 // Find the processed school entry using the originalIndex
+                  let processedSchool = null;
+                  outerLoop:
+                  for (const type in schoolsByType) {
+                      for (const school of schoolsByType[type]) {
+                           if (school.originalIndex === index) {
+                               processedSchool = school;
+                               break outerLoop; // Found it
+                           }
+                      }
+                  }
+
 
                  if (!processedSchool) {
-                     console.error("Could not find processed school data for index:", index, "Item:", itemData);
-                     // Fallback: create a basic processedSchool object, might lack some properties
+                     // This indicates an issue in processSchoolData or data consistency
+                     console.error("CRITICAL: Could not find processed school data for index:", index, "Item:", itemData);
+                     // As a fallback, create a minimal entry, but this shouldn't happen
                      processedSchool = {
                          ...itemData,
-                         isVisible: filterState[itemData.type] !== undefined ? filterState[itemData.type] : true, // Get initial visibility from filterState
+                         isVisible: filterState[itemData.type] !== undefined ? filterState[itemData.type] : true,
                          type: itemData.type || "Unknown",
                          displayName: itemData.name,
                          originalIndex: index
                      };
-                      // Ensure it's added to schoolsByType if completely missed by processSchoolData (shouldn't happen)
-                      if (processedSchool.type !== "Unknown" && !schoolsByType[processedSchool.type]) schoolsByType[processedSchool.type] = [];
-                      if (processedSchool.type !== "Unknown" && !schoolsByType[processedSchool.type].some(s => s.originalIndex === index)) {
-                           schoolsByType[processedSchool.type].push(processedSchool);
+                     // Attempt to add to schoolsByType if missed
+                     const type = processedSchool.type;
+                      if (type !== "Unknown") {
+                          if (!schoolsByType[type]) schoolsByType[type] = [];
+                          if (!schoolsByType[type].some(s => s.originalIndex === index)) {
+                              schoolsByType[type].push(processedSchool);
+                              console.warn("Fallback: Added missing school to schoolsByType:", processedSchool);
+                          }
+                           if (processedSchool.person && !schoolsByType[attendedCategoryName].some(s => s.originalIndex === index)) {
+                                schoolsByType[attendedCategoryName].push(processedSchool);
+                                console.warn("Fallback: Added missing attended school to schoolsByType:", processedSchool);
+                           }
                       }
                  }
 
                  const type = processedSchool.type;
-                 const markerColor = typeColors[type] || '#cccccc'; // Use defined color or default
-                 const personColor = processedSchool.person && personColors[processedSchool.person] ? personColors[processedSchool.person] : null;
-                 const displayColor = personColor || markerColor; // Prioritize person color
+                 const schoolPerson = processedSchool.person;
+                 let displayColor = typeColors[type] || '#cccccc'; // Default to type color
 
+                 // Override with person color if applicable
+                 if (schoolPerson && personColors[schoolPerson]) {
+                     displayColor = personColors[schoolPerson];
+                 }
+
+                 // Define marker icon
                  const markerIcon = {
                      path: google.maps.SymbolPath.CIRCLE,
                      fillColor: displayColor,
                      fillOpacity: 0.9,
-                     strokeColor: isDarkMode ? '#111111' : '#ffffff', // Adjust stroke for dark/light mode
+                     strokeColor: isDarkMode ? '#111111' : '#ffffff', // Initial stroke based on potential initial dark mode
                      strokeWeight: 1.0,
-                     scale: 7
+                     scale: 7 // Adjust size if needed
                  };
 
+                 // Create the marker
                  const marker = new google.maps.Marker({
                      position: { lat: processedSchool.lat, lng: processedSchool.lng },
                      map: map,
-                     title: processedSchool.name,
+                     title: processedSchool.displayName, // Use display name for tooltip
                      icon: markerIcon,
-                     visible: processedSchool.isVisible // Set initial visibility based on processed data
+                     visible: processedSchool.isVisible // Set initial visibility
                  });
 
-                 // Store marker and associated processed school data
+                 // Store marker info
                  allMarkers[index] = { marker: marker, type: type, school: processedSchool };
 
-                 // Add click listener for info window
+                 // Add marker click listener
                  marker.addListener("click", () => {
-                     const schoolData = allMarkers[index].school; // Use the stored processed school data
+                     const schoolData = allMarkers[index].school; // Get data associated with this marker
                      let contentString = `<div class="info-window-content">`;
                      const targetUrl = schoolData.homepageUrl || '#';
                      const openInNewTab = schoolData.homepageUrl ? 'target="_blank"' : '';
-                     if (schoolData.imageUrl && schoolData.imageUrl !== 'x') contentString += `<a href="${targetUrl}" ${openInNewTab}><img src="${schoolData.imageUrl}" alt="${schoolData.name} logo/photo"></a>`;
-                     if (schoolData.homepageUrl) contentString += `<a href="${targetUrl}" ${openInNewTab}><b>${schoolData.displayName}</b></a>`; else contentString += `<b>${schoolData.displayName}</b>`; // Use displayName
+
+                     // Image
+                     if (schoolData.imageUrl && schoolData.imageUrl !== 'x') {
+                         contentString += `<a href="${targetUrl}" ${openInNewTab}><img src="${schoolData.imageUrl}" alt="${schoolData.name} logo/photo"></a>`;
+                     }
+                     // Name (linked)
+                     if (schoolData.homepageUrl) {
+                         contentString += `<a href="${targetUrl}" ${openInNewTab}><b>${schoolData.displayName}</b></a>`;
+                     } else {
+                         contentString += `<b>${schoolData.displayName}</b>`;
+                     }
+                     // Type
                      contentString += `<br><span class="info-window-type">Type: ${schoolData.type}</span>`;
-                     if (schoolData.person) contentString += `<br><span class="info-window-person">Attended by: ${schoolData.person}</span>`;
+                     // Person (if applicable, with color)
+                     if(schoolData.person && personColors[schoolData.person]) {
+                         const personColor = personColors[schoolData.person];
+                         contentString += `<br><span class="info-window-person" style="color: ${personColor};">Attended by: ${schoolData.person}</span>`;
+                     }
                      contentString += `</div>`;
+
                      infowindow.setContent(contentString);
                      infowindow.open(map, marker);
                  });
-             });
+             }); // End allData.forEach for markers
              console.log(`${allMarkers.filter(m => m).length} Markers created and stored.`);
 
-            // --- Event Listeners ---
-            darkModeToggle.addEventListener('click', () => { /* ... Dark mode unchanged ... */
-                 isDarkMode = !isDarkMode; document.body.classList.toggle('dark-mode', isDarkMode); map.setOptions({ styles: isDarkMode ? darkModeStyle : null });
-                 allMarkers.forEach(mInfo => { if (mInfo && mInfo.marker) { const icon = mInfo.marker.getIcon(); if(icon && typeof icon === 'object') { icon.strokeColor = isDarkMode ? '#111111' : '#ffffff'; mInfo.marker.setIcon(icon); } } });
-                 darkModeToggle.textContent = isDarkMode ? '☀️ Switch to Light Mode' : '🌙 Switch to Dark Mode'; darkModeToggle.title = isDarkMode ? 'Switch to Light Mode' : 'Switch to Dark Mode';
+            // --- Set up Global Event Listeners ---
+            darkModeToggle.addEventListener('click', () => {
+                 isDarkMode = !isDarkMode;
+                 document.body.classList.toggle('dark-mode', isDarkMode);
+                 map.setOptions({ styles: isDarkMode ? darkModeStyle : null });
+
+                 // Update marker stroke color for dark mode
+                 allMarkers.forEach(mInfo => {
+                     if (mInfo && mInfo.marker) {
+                         const icon = mInfo.marker.getIcon();
+                         if(icon && typeof icon === 'object') { // Check if icon is a Symbol object
+                             icon.strokeColor = isDarkMode ? '#111111' : '#ffffff';
+                             mInfo.marker.setIcon(icon); // Re-apply the icon with updated stroke
+                         }
+                     }
+                 });
+
+                 // Update list item name colors for attended schools in dark mode
+                 const attendedListItems = schoolListDiv.querySelectorAll('li.attended-by-person span.school-name');
+                 attendedListItems.forEach(span => {
+                    // Find the school data to get the person
+                    const listItem = span.closest('li');
+                    const markerIndex = listItem ? parseInt(listItem.getAttribute('data-marker-index'), 10) : -1;
+                    if (markerIndex !== -1 && allMarkers[markerIndex] && allMarkers[markerIndex].school && allMarkers[markerIndex].school.person) {
+                        const person = allMarkers[markerIndex].school.person;
+                        const color = personColors[person] || '#007FFF'; // Fallback
+                        // Optionally adjust color for dark mode here if needed
+                        span.style.color = color; // Re-apply color (might need dark mode adjustment)
+                    }
+                 });
+
+
+                 darkModeToggle.textContent = isDarkMode ? '☀️ Switch to Light Mode' : '🌙 Switch to Dark Mode';
+                 darkModeToggle.title = isDarkMode ? 'Switch to Light Mode' : 'Switch to Dark Mode';
             });
+
             schoolSearchInput.addEventListener('input', filterSchoolList);
-            checkAllBtn.addEventListener('click', () => { /* ... Check all unchanged ... */
-                 console.log("Checking all type filters..."); const typeCheckboxes = filterControlDiv.querySelectorAll('.filter-item input[type="checkbox"]');
-                 typeCheckboxes.forEach(cb => { cb.checked = true; cb.indeterminate = false; const typeName = cb.value; filterState[typeName] = true; updateIndividualCheckboxesForType(typeName, true); });
-                 updateMarkersVisibility(); filterSchoolList(); // Apply filter
-             });
-             uncheckAllBtn.addEventListener('click', () => { /* ... Uncheck all unchanged ... */
-                 console.log("Unchecking all type filters..."); const typeCheckboxes = filterControlDiv.querySelectorAll('.filter-item input[type="checkbox"]');
-                 typeCheckboxes.forEach(cb => { cb.checked = false; cb.indeterminate = false; const typeName = cb.value; filterState[typeName] = false; updateIndividualCheckboxesForType(typeName, false); });
-                 updateMarkersVisibility(); filterSchoolList(); // Apply filter
+
+            checkAllBtn.addEventListener('click', () => {
+                 console.log("Checking all type filters...");
+                 const typeCheckboxes = filterControlDiv.querySelectorAll('.filter-item input[type="checkbox"]');
+                 typeCheckboxes.forEach(cb => {
+                     if (!cb.checked || cb.indeterminate) {
+                          cb.indeterminate = false;
+                          cb.checked = true;
+                          cb.dispatchEvent(new Event('change', { bubbles: true })); // Trigger change event
+                     }
+                 });
+                 // No need to call updateMarkersVisibility or filterSchoolList here
              });
 
-            // --- Initial State ---
-            // Set initial visibility based on filterState (already done during marker creation using processedSchool.isVisible)
-            // updateMarkersVisibility(); // Call once after markers are created
-            filterSchoolList(); // Apply initial search filter (if any) and hide empty categories/subheaders
+             uncheckAllBtn.addEventListener('click', () => {
+                 console.log("Unchecking all type filters...");
+                 const typeCheckboxes = filterControlDiv.querySelectorAll('.filter-item input[type="checkbox"]');
+                 typeCheckboxes.forEach(cb => {
+                     if (cb.checked || cb.indeterminate) {
+                          cb.indeterminate = false;
+                          cb.checked = false;
+                          cb.dispatchEvent(new Event('change', { bubbles: true })); // Trigger change event
+                     }
+                 });
+                 // No need to call updateMarkersVisibility or filterSchoolList here
+             });
+
+            // --- Initial Filter & Update ---
+            filterSchoolList(); // Apply initial search filter (if any)
+             updateMarkersVisibility(); // Ensure markers match initial state
+            // Update indeterminate state for all parent filters initially
+             Object.keys(schoolsByType).forEach(typeName => {
+                 updateParentFilterState(typeName);
+             });
+
 
             console.log("Map initialization complete.");
-        }
+        } // End initMap
 
-        function gmLoadError() { /* ... error handling unchanged ... */ console.error("Google Maps failed to load."); document.getElementById('map').innerHTML = '<p style="padding: 20px; text-align: center; color: red; background-color: #ffebee;">Error: Could not load Google Maps. Please check your API key, network connection, and ensure the Google Maps JavaScript API is enabled for your key.</p>'; }
+        /**
+         * Error handler for Google Maps API load failure.
+         */
+        function gmLoadError() {
+            console.error("Google Maps failed to load.");
+            document.getElementById('map').innerHTML = '<p style="padding: 20px; text-align: center; color: red; background-color: #ffebee;">Error: Could not load Google Maps. Please check your API key, network connection, and ensure the Google Maps JavaScript API is enabled for your key.</p>';
+        }
 
     </script>
     <script
-        src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCVEZB2WjUpEhqnqGjY_zMCQSKUHTdjAWc&callback=initMap&onerror=gmLoadError&v=weekly"
+        src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCVEZB2WjUpEhqnqGjY_zMCQSKUHTdjAWc&callback=initMap&onerror=gmLoadError&v=weekly" // REPLACE YOUR_API_KEY
         async
         defer
-    ></script> <!-- Remember to replace YOUR_API_KEY -->
+    ></script>
 </body>
 </html>
+
